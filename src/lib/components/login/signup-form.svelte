@@ -4,14 +4,14 @@
   import GoogleIcon from '~icons/mdi/google'
   import SpinnerIcon from '~icons/gg/spinner'
 
+  // UI
   import toast from 'svelte-french-toast'
   import { Button } from '$lib/components/ui/button'
   import { Input } from '$lib/components/ui/input'
   import { Label } from '$lib/components/ui/label'
   import { cn } from '$lib/utils'
 
-  import { enhance } from '$app/forms'
-
+  // Utils
   let className: string | undefined | null = undefined
   export { className as class }
 
@@ -19,6 +19,8 @@
 
   let isLoading = false
   async function onSubmit() {
+    console.log(errors)
+
     isLoading = true
 
     setTimeout(() => {
@@ -34,6 +36,8 @@
       })
     }, 1000)
   }
+
+  export let form: any, errors: any, enhance: any, constraints: any
 </script>
 
 <div class={cn('grid gap-6', className)} {...$$restProps}>
@@ -63,8 +67,7 @@
   </div>
 
   <!-- Form -->
-  <!-- method="post" use:enhance -->
-  <form on:submit={onSubmit}>
+  <form use:enhance method="post" on:submit={onSubmit}>
     <div class="grid gap-4">
       <div class="grid gap-2.5">
         <Label class="sr-only" for="email">Email</Label>
@@ -77,7 +80,14 @@
           autocomplete="email"
           autocorrect="off"
           disabled={isLoading}
+          bind:value={form.email}
+          {...constraints.email}
         />
+        {#if errors.email}
+          <small>
+            {errors.email}
+          </small>
+        {/if}
         <Input
           id="password"
           placeholder="Enter your password"
@@ -86,7 +96,14 @@
           autocapitalize="none"
           autocorrect="off"
           disabled={isLoading}
+          bind:value={form.password}
+          {...constraints.password}
         />
+        {#if errors.password}
+          <small>
+            {errors.password}
+          </small>
+        {/if}
       </div>
       <Button type="submit" class="capitalize" disabled={isLoading}>
         {#if isLoading}

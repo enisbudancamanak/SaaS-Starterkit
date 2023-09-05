@@ -1,38 +1,37 @@
 import { fail, redirect } from '@sveltejs/kit'
 import { auth } from '$lib/server/lucia'
 
-// @ts-ignore
-export async function load({ locals }) {
+import type { PageServerLoad, Actions } from './$types'
+
+export const load: PageServerLoad = async ({ locals }) => {
   const session = await locals.auth.validate()
-  // if (session) {
-  //   if (!session.user.emailVerified) throw redirect(302, '/email-verification')
-  //   throw redirect(302, '/')
-  // }
-  return {}
+  if (session) {
+    // if (!session.user.emailVerified) throw redirect(302, '/email-verification')
+    throw redirect(302, '/home')
+  }
 }
 
-/** @type {import('./$types').Actions} */
-export const actions = {
+export const actions: Actions = {
   default: async ({ request, locals }) => {
     const formData = await request.formData()
     const email = formData.get('email')
     const password = formData.get('password')
 
     // basic check
-    // if (typeof email !== 'string' || email.length < 1 || email.length > 255) {
-    //   return fail(400, {
-    //     message: 'Invalid email',
-    //   })
-    // }
-    // if (
-    //   typeof password !== 'string' ||
-    //   password.length < 1 ||
-    //   password.length > 255
-    // ) {
-    //   return fail(400, {
-    //     message: 'Invalid password',
-    //   })
-    // }
+    if (typeof email !== 'string' || email.length < 1 || email.length > 255) {
+      return fail(400, {
+        message: 'Invalid email',
+      })
+    }
+    if (
+      typeof password !== 'string' ||
+      password.length < 1 ||
+      password.length > 255
+    ) {
+      return fail(400, {
+        message: 'Invalid password',
+      })
+    }
 
     try {
       // find user by key

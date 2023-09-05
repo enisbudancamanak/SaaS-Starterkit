@@ -23,16 +23,20 @@
     <!-- Social Login -->
     <div class="flex w-full gap-4">
       <!-- GitHub -->
-      <Button class="flex-1" variant="outline" type="button">
-        <GithubIcon class="w-4 h-4 mr-2" />
-        GitHub
-      </Button>
+      <a class="flex-1" href="/login/github">
+        <Button class="w-full" variant="outline" type="button">
+          <GithubIcon class="w-4 h-4 mr-2" />
+          GitHub
+        </Button>
+      </a>
 
       <!-- Google -->
-      <Button class="flex-1" variant="outline" type="button">
-        <GoogleIcon class="w-4 h-4 mr-2" />
-        Google
-      </Button>
+      <a class="flex-1" href="/login/google">
+        <Button class="w-full" variant="outline" type="button">
+          <GoogleIcon class="w-4 h-4 mr-2" />
+          Google
+        </Button>
+      </a>
     </div>
 
     <!-- or -->

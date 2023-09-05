@@ -1,9 +1,10 @@
 <script>
-  import { fade } from 'svelte/transition'
   import '../app.postcss'
 
-  import { Toaster } from 'svelte-french-toast'
-  import { onNavigate } from '$app/navigation'
+  import toast, { Toaster } from 'svelte-french-toast'
+  import { beforeNavigate, onNavigate } from '$app/navigation'
+  import { page } from '$app/stores'
+  import { initFlash } from 'sveltekit-flash-message/client'
 
   // https://svelte.dev/blog/view-transitions
   onNavigate((navigation) => {
@@ -16,6 +17,32 @@
       })
     })
   })
+
+  //Flash Messages
+  // ALERT-TODO: https://www.youtube.com/watch?v=hB6OkaYWS5I
+  const flash = initFlash(page)
+
+  beforeNavigate((nav) => {
+    if ($flash && nav.from?.url.toString() !== nav.to?.url.toString())
+      $flash = undefined
+  })
+
+  $: if ($flash) {
+    switch ($flash.type) {
+      case 'success':
+        toast.success($flash.message, {
+          style: 'border: 1px solid #09090b; padding: 16px; color: #09090b;',
+          iconTheme: {
+            primary: '#09090b',
+            secondary: '#FAFAFA',
+          },
+        })
+        break
+      case 'error':
+        toast.error($flash.message)
+        break
+    }
+  }
 </script>
 
 <Toaster />

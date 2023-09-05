@@ -7,8 +7,15 @@
   import SignupForm from '$lib/components/login/signup-form.svelte'
   import { goto } from '$app/navigation'
 
+  // Server
+  import { superForm } from 'sveltekit-superforms/client'
+
   // Utils
   let clickedContinue = false
+
+  export let data
+  const { form, errors, enhance, constraints } = superForm(data.form)
+  // , { taintedMessage: 'Are you sure you want to leave?', }
 </script>
 
 <div
@@ -28,7 +35,13 @@
 
       <!-- Login Form -->
       {#if !clickedContinue}
-        <SignupForm bind:clickedContinue />
+        <SignupForm
+          bind:clickedContinue
+          bind:form={$form}
+          bind:errors={$errors}
+          bind:constraints={$constraints}
+          {enhance}
+        />
       {:else}
         <EnterCodeForm />
       {/if}

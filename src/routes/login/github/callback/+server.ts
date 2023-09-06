@@ -33,7 +33,7 @@ export const GET = async ({ url, cookies, locals }) => {
       await githubAuth.validateCallback(code)
 
     const githubUserEmails = await handleRequest<GitHubUserEmail[]>(
-      new Request('https://api.github.com/user/public_emails', {
+      new Request('https://api.github.com/user/emails', {
         headers: {
           Authorization: `Token ${githubTokens.accessToken}`,
         },
@@ -50,7 +50,7 @@ export const GET = async ({ url, cookies, locals }) => {
         throw new Error('Email not verified')
       }
       const existingDatabaseUserWithEmail = await getUserByEmail(
-        primaryEmail.email
+        primaryEmail.email.toLowerCase()
       )
 
       if (existingDatabaseUserWithEmail) {
@@ -61,7 +61,7 @@ export const GET = async ({ url, cookies, locals }) => {
       }
       return await createUser({
         attributes: {
-          email: primaryEmail.email,
+          email: primaryEmail.email.toLowerCase(),
         },
       })
     }
@@ -95,25 +95,9 @@ export const GET = async ({ url, cookies, locals }) => {
 function getUserByEmail(email: string) {
   return prisma.user.findFirst({
     where: {
-      email: email,
+      email: email.toLowerCase(),
     },
   })
-}
-
-async function getGithubUserEmails(accessToken: string) {
-  const response = await fetch('https://api.github.com/user/public_emails', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-  })
-
-  if (!response.ok) {
-    console.log(response.status, response.statusText)
-    // throw new OAuthRequestError(response, response)
-  }
-
-  return await response.json()
 }
 
 type GitHubUserEmail = {

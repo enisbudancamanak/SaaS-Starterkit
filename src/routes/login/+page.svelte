@@ -3,11 +3,14 @@
   import RandomLogo from '~icons/fa6-solid/blog'
 
   // UI
-  import { Button } from '$lib/components/ui/button'
   import LoginForm from '$lib/components/login/login-form.svelte'
   import { goto } from '$app/navigation'
 
   // Utils
+  import { superForm } from 'sveltekit-superforms/client'
+
+  export let data
+  const { form } = superForm(data.form)
 </script>
 
 <div
@@ -26,7 +29,7 @@
       </div>
 
       <!-- Login Form -->
-      <LoginForm />
+      <LoginForm bind:form={$form} />
 
       <!-- No Account? -->
       <p class="px-8 text-sm text-center text-muted-foreground">

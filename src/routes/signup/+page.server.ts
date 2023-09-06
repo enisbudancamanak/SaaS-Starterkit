@@ -1,29 +1,37 @@
-import { z } from 'zod'
-import { superValidate } from 'sveltekit-superforms/server'
 import { fail } from '@sveltejs/kit'
+import { superValidate } from 'sveltekit-superforms/server'
+import { newUserSchema } from '$lib/schema'
+import { auth } from '$lib/server/lucia'
 
-const newUserSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-})
-
-//
 export const load = async (event) => {
   const form = await superValidate(event, newUserSchema)
 
   return { form }
 }
 
-/** @type {import('./$types').Actions} */
 export const actions = {
   default: async (event) => {
-    const form = await superValidate(event, newUserSchema)
-    console.log(form)
+    // const form = await superValidate(event, newUserSchema)
 
-    if (!form.valid) {
-      return fail(400, { form })
-    }
+    // if (!form.valid) {
+    //   return fail(400, { form })
+    // }
 
-    return { form }
+    const { email, password } = Object.fromEntries(
+      await event.request.formData()
+    ) as Record<string, string>
+
+    try {
+      await auth.createUser({
+        key: {
+          providerId: 'email',
+          providerUserId: email.toLowerCase(),
+          password,
+        },
+        attributes: {
+          email: email.toLowerCase(),
+        },
+      })
+    } catch (e) {}
   },
 }

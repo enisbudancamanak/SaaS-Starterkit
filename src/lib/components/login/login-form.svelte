@@ -1,43 +1,26 @@
 <script lang="ts">
   // Icons
   import EmailIcon from '~icons/mdi/email'
-  import GithubIcon from '~icons/mdi/github'
-  import GoogleIcon from '~icons/mdi/google'
 
   // UI
+  import SocialLogins from '../social-logins.svelte'
+  import * as Form from '$lib/components/ui/form'
   import { Button } from '$lib/components/ui/button'
   import { cn } from '$lib/utils'
-  import { Input } from '$lib/components/ui/input'
-  import { Label } from '$lib/components/ui/label'
-  import { enhance } from '$app/forms'
+  import { newUserSchema } from '$lib/schema'
 
   // Utils
   let className: string | undefined | null = undefined
   export { className as class }
 
   let emailContinue = false
+  export let form: any
 </script>
 
 <div class={cn('grid gap-6', className)} {...$$restProps}>
   {#if !emailContinue}
     <!-- Social Login -->
-    <div class="flex w-full gap-4">
-      <!-- GitHub -->
-      <a class="flex-1" href="/login/github">
-        <Button class="w-full" variant="outline" type="button">
-          <GithubIcon class="w-4 h-4 mr-2" />
-          GitHub
-        </Button>
-      </a>
-
-      <!-- Google -->
-      <a class="flex-1" href="/login/google">
-        <Button class="w-full" variant="outline" type="button">
-          <GoogleIcon class="w-4 h-4 mr-2" />
-          Google
-        </Button>
-      </a>
-    </div>
+    <SocialLogins />
 
     <!-- or -->
     <div class="relative">
@@ -63,33 +46,22 @@
     </Button>
   {/if}
   <!-- Form -->
-  <!-- Form -->
-  <!-- method="post" use:enhance -->
   {#if emailContinue}
-    <form method="post" use:enhance>
-      <div class="grid gap-4">
-        <div class="grid gap-2.5">
-          <Label class="sr-only" for="email">Email</Label>
-          <Input
-            id="email"
-            placeholder="Enter your email address"
-            type="email"
-            name="email"
-            autocapitalize="none"
-            autocomplete="email"
-            autocorrect="off"
-          />
-          <Input
-            id="password"
-            placeholder="Enter your password"
-            type="password"
-            name="password"
-            autocapitalize="none"
-            autocorrect="off"
-          />
-        </div>
-        <Button type="submit" class="capitalize">login</Button>
-      </div>
-    </form>
+    <Form.Root method="POST" {form} schema={newUserSchema} let:config>
+      <Form.Field {config} name="email">
+        <Form.Item>
+          <Form.Input type="email" placeholder="Enter your email address" />
+          <Form.Validation />
+        </Form.Item>
+      </Form.Field>
+
+      <Form.Field {config} name="password">
+        <Form.Item>
+          <Form.Input type="password" placeholder="Enter your password" />
+          <Form.Validation />
+        </Form.Item>
+      </Form.Field>
+      <Form.Button class="w-full">Continue</Form.Button>
+    </Form.Root>
   {/if}
 </div>

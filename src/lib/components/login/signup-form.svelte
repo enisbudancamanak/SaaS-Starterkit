@@ -1,17 +1,16 @@
 <script lang="ts">
   // Icons
-  import GithubIcon from '~icons/mdi/github'
-  import GoogleIcon from '~icons/mdi/google'
   import SpinnerIcon from '~icons/gg/spinner'
 
   // UI
+  import SocialLogins from '../social-logins.svelte'
   import toast from 'svelte-french-toast'
-  import { Button } from '$lib/components/ui/button'
-  import { Input } from '$lib/components/ui/input'
-  import { Label } from '$lib/components/ui/label'
+  import * as Form from '$lib/components/ui/form'
   import { cn } from '$lib/utils'
 
   // Utils
+  import { newUserSchema } from '$lib/schema'
+
   let className: string | undefined | null = undefined
   export { className as class }
 
@@ -37,24 +36,12 @@
     }, 1000)
   }
 
-  export let form: any, errors: any, enhance: any, constraints: any
+  export let form: any
 </script>
 
 <div class={cn('grid gap-6', className)} {...$$restProps}>
   <!-- Social Login -->
-  <div class="flex w-full gap-4">
-    <!-- GitHub -->
-    <Button class="flex-1" variant="outline" type="button" disabled={isLoading}>
-      <GithubIcon class="w-4 h-4 mr-2" />
-      GitHub
-    </Button>
-
-    <!-- Google -->
-    <Button class="flex-1" variant="outline" type="button" disabled={isLoading}>
-      <GoogleIcon class="w-4 h-4 mr-2" />
-      Google
-    </Button>
-  </div>
+  <SocialLogins />
 
   <!-- or -->
   <div class="relative">
@@ -67,50 +54,39 @@
   </div>
 
   <!-- Form -->
-  <form use:enhance method="post" on:submit={onSubmit}>
-    <div class="grid gap-4">
-      <div class="grid gap-2.5">
-        <Label class="sr-only" for="email">Email</Label>
-        <Input
-          id="email"
-          placeholder="Enter your email address"
+  <Form.Root
+    method="POST"
+    action="/signup"
+    {form}
+    schema={newUserSchema}
+    let:config
+  >
+    <Form.Field {config} name="email">
+      <Form.Item>
+        <Form.Input
           type="email"
-          name="email"
-          autocapitalize="none"
-          autocomplete="email"
-          autocorrect="off"
+          placeholder="Enter your email address"
           disabled={isLoading}
-          bind:value={form.email}
-          {...constraints.email}
         />
-        {#if errors.email}
-          <small>
-            {errors.email}
-          </small>
-        {/if}
-        <Input
-          id="password"
-          placeholder="Enter your password"
+        <Form.Validation />
+      </Form.Item>
+    </Form.Field>
+
+    <Form.Field {config} name="password">
+      <Form.Item>
+        <Form.Input
           type="password"
-          name="password"
-          autocapitalize="none"
-          autocorrect="off"
+          placeholder="Enter your password"
           disabled={isLoading}
-          bind:value={form.password}
-          {...constraints.password}
         />
-        {#if errors.password}
-          <small>
-            {errors.password}
-          </small>
-        {/if}
-      </div>
-      <Button type="submit" class="capitalize" disabled={isLoading}>
-        {#if isLoading}
-          <SpinnerIcon class="w-4 h-4 mr-2 animate-spin" />
-        {/if}
-        continue
-      </Button>
-    </div>
-  </form>
+        <Form.Validation />
+      </Form.Item>
+    </Form.Field>
+    <Form.Button class="w-full">
+      {#if isLoading}
+        <SpinnerIcon class="w-4 h-4 mr-2 animate-spin" />
+      {/if}
+      Continue
+    </Form.Button>
+  </Form.Root>
 </div>

@@ -14,7 +14,7 @@
   let clickedContinue = false
 
   export let data
-  const { form, errors, enhance, constraints } = superForm(data.form)
+  const { form } = superForm(data.form)
   // , { taintedMessage: 'Are you sure you want to leave?', }
 </script>
 
@@ -35,13 +35,7 @@
 
       <!-- Login Form -->
       {#if !clickedContinue}
-        <SignupForm
-          bind:clickedContinue
-          bind:form={$form}
-          bind:errors={$errors}
-          bind:constraints={$constraints}
-          {enhance}
-        />
+        <SignupForm bind:clickedContinue bind:form={$form} />
       {:else}
         <EnterCodeForm />
       {/if}

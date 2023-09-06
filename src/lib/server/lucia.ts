@@ -10,6 +10,7 @@ import {
   GITHUB_CLIENT_SECRET,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URI,
 } from '$env/static/private'
 
 export const auth = lucia({
@@ -29,12 +30,17 @@ export const auth = lucia({
 export const githubAuth = github(auth, {
   clientId: GITHUB_CLIENT_ID,
   clientSecret: GITHUB_CLIENT_SECRET,
+  scope: ['read:user', 'user:email'],
 })
 
 export const googleAuth = google(auth, {
   clientId: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  redirectUri: 'http://localhost:5137/login/google/callback',
+  redirectUri: GOOGLE_REDIRECT_URI,
+  scope: [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email',
+  ],
 })
 
 export type Auth = typeof auth

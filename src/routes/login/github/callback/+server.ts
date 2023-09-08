@@ -3,6 +3,7 @@ import { auth, githubAuth } from '$lib/server/lucia.js'
 import { OAuthRequestError } from '@lucia-auth/oauth'
 import { prisma } from '$lib/server/prisma'
 import { handleRequest } from '$lib/utils/oauth'
+import { error } from '@sveltejs/kit'
 
 export const GET = async ({ url, cookies, locals }) => {
   /**
@@ -47,7 +48,7 @@ export const GET = async ({ url, cookies, locals }) => {
       const existingUser = await getExistingUser()
       if (existingUser) return existingUser
       if (!primaryEmail.verified) {
-        throw new Error('Email not verified')
+        throw error(404, 'Email not verified')
       }
       const existingDatabaseUserWithEmail = await getUserByEmail(
         primaryEmail.email.toLowerCase()
@@ -62,6 +63,7 @@ export const GET = async ({ url, cookies, locals }) => {
       return await createUser({
         attributes: {
           email: primaryEmail.email.toLowerCase(),
+          email_verified: Number(1),
         },
       })
     }
@@ -76,7 +78,7 @@ export const GET = async ({ url, cookies, locals }) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: '/home',
+        Location: '/signup/email-verification',
       },
     })
   } catch (e) {

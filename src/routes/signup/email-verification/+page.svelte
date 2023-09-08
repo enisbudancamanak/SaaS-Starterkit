@@ -3,15 +3,14 @@
   import RandomLogo from '~icons/fa6-solid/blog'
 
   // UI
+
+  // Server
   import EnterCodeForm from '$lib/components/login/enter-code-form.svelte'
-  import SignupForm from '$lib/components/login/signup-form.svelte'
-  import { goto } from '$app/navigation'
-  import type { PageData } from './$types'
+  import { enhance } from '$app/forms'
 
   // Utils
-  let clickedContinue = false
 
-  export let data: PageData
+  export let data
 </script>
 
 <div
@@ -25,29 +24,20 @@
       <div class="flex flex-col items-center justify-center w-full gap-4">
         <RandomLogo class="w-12 h-12 -mt-6" />
         <h1 class="mb-6 text-3xl font-bold tracking-tight text-center">
-          Join SaaS-Kit!
+          Check your inbox
         </h1>
       </div>
 
       <!-- Login Form -->
-      {#if !data?.session?.user?.email}
-        <SignupForm bind:clickedContinue form={data.form} />
-      {:else}
-        <EnterCodeForm email={data?.session?.user?.email} />
-      {/if}
+      <EnterCodeForm email={data?.session?.user?.email} />
     </div>
 
-    <p class="px-8 text-sm text-center text-muted-foreground">
-      Already have an Account?
-      <button
-        class="underline link"
-        on:click={() => {
-          goto('/login')
-        }}
-      >
-        Login
-      </button>
-    </p>
+    <form action="?/logout" method="post" class="pt-8" use:enhance>
+      <p class="px-8 text-sm text-center text-muted-foreground">
+        Wrong email?
+        <button type="submit" class="underline link"> Logout </button>
+      </p>
+    </form>
   </div>
 
   <!-- Right Side (Image) -->

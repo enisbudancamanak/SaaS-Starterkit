@@ -3,40 +3,20 @@
   import SpinnerIcon from '~icons/gg/spinner'
 
   // UI
-  import SocialLogins from '../social-logins.svelte'
-  import toast from 'svelte-french-toast'
   import * as Form from '$lib/components/ui/form'
+  import SocialLogins from '../social-logins.svelte'
+  import PasswordStrength from '../passwordStrength.svelte'
   import { cn } from '$lib/utils'
 
   // Utils
-  import { newUserSchema } from '$lib/schema'
+  import { newUserSchema, type FormSchema } from '$lib/schema'
+  import type { SuperValidated } from 'sveltekit-superforms'
 
   let className: string | undefined | null = undefined
   export { className as class }
 
-  export let clickedContinue
-
-  let isLoading = false
-  async function onSubmit() {
-    console.log(errors)
-
-    isLoading = true
-
-    setTimeout(() => {
-      isLoading = false
-      clickedContinue = true
-
-      toast.success('email sent', {
-        style: 'border: 1px solid #09090b; padding: 16px; color: #09090b;',
-        iconTheme: {
-          primary: '#09090b',
-          secondary: '#FAFAFA',
-        },
-      })
-    }, 1000)
-  }
-
-  export let form: any
+  export let form: SuperValidated<FormSchema>
+  let password: string = ''
 </script>
 
 <div class={cn('grid gap-6', className)} {...$$restProps}>
@@ -54,39 +34,21 @@
   </div>
 
   <!-- Form -->
-  <Form.Root
-    method="POST"
-    action="/signup"
-    {form}
-    schema={newUserSchema}
-    let:config
-  >
+  <Form.Root method="POST" {form} schema={newUserSchema} let:config>
     <Form.Field {config} name="email">
       <Form.Item>
-        <Form.Input
-          type="email"
-          placeholder="Enter your email address"
-          disabled={isLoading}
-        />
+        <Form.Input type="email" placeholder="Enter your email address" />
         <Form.Validation />
       </Form.Item>
     </Form.Field>
 
     <Form.Field {config} name="password">
       <Form.Item>
-        <Form.Input
-          type="password"
-          placeholder="Enter your password"
-          disabled={isLoading}
-        />
+        <Form.Input type="password" placeholder="Enter your password" />
         <Form.Validation />
+        <!-- <PasswordStrength {password} /> -->
       </Form.Item>
     </Form.Field>
-    <Form.Button class="w-full">
-      {#if isLoading}
-        <SpinnerIcon class="w-4 h-4 mr-2 animate-spin" />
-      {/if}
-      Continue
-    </Form.Button>
+    <Form.Button class="w-full">Continue</Form.Button>
   </Form.Root>
 </div>

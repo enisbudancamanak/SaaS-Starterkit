@@ -7,7 +7,7 @@
   import * as Form from '$lib/components/ui/form'
   import { Button } from '$lib/components/ui/button'
   import { cn } from '$lib/utils'
-  import { newUserSchema } from '$lib/schema'
+  import { loginSchema } from '$lib/schema'
 
   // Utils
   let className: string | undefined | null = undefined
@@ -47,18 +47,18 @@
   {/if}
   <!-- Form -->
   {#if emailContinue}
-    <Form.Root method="POST" {form} schema={newUserSchema} let:config>
+    <Form.Root method="POST" {form} schema={loginSchema} let:config>
       <Form.Field {config} name="email">
         <Form.Item>
           <Form.Input type="email" placeholder="Enter your email address" />
-          <Form.Validation />
+          <!-- <Form.Validation /> -->
         </Form.Item>
       </Form.Field>
 
       <Form.Field {config} name="password">
         <Form.Item>
           <Form.Input type="password" placeholder="Enter your password" />
-          <Form.Validation />
+          <!-- <Form.Validation /> -->
         </Form.Item>
       </Form.Field>
       <Form.Button class="w-full">Continue</Form.Button>

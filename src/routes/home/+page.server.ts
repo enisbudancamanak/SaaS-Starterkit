@@ -4,15 +4,16 @@ import { redirect } from 'sveltekit-flash-message/server'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ locals }) => {
-  try {
-    const session = await locals.auth.validate()
+  const session = await locals.auth.validate()
+
+  if (session) {
+    if (!session.user.emailVerified)
+      throw redirect(302, '/signup/email-verification')
 
     return {
       userId: session.user.userId,
       email: session.user.email,
     }
-  } catch (e) {
-    //not signed in
   }
 }
 
@@ -28,11 +29,5 @@ export const actions: Actions = {
       { type: 'success', message: 'successfully logged out!' },
       event
     )
-
-    // const message = {
-    //   type: 'success',
-    //   message: "That's the entrepreneur spirit!",
-    // } as const
-    // throw redirect(message, event)
   },
 }

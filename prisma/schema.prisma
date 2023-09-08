@@ -19,6 +19,13 @@ model User {
   key             Key[]
 }
 
+model VerificationCode {
+  id        Int       @id @default(autoincrement())
+  user_id   String
+  code      String
+  expires   BigInt
+}
+
 model Session {
   id             String @id @unique
   user_id        String

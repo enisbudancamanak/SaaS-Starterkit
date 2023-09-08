@@ -7,6 +7,6 @@
   export { className as class }
 </script>
 
-<div class={cn('space-y-0.5 mb-3', className)} {...$$restProps}>
+<div class={cn('space-y-1.5 mb-3', className)} {...$$restProps}>
   <slot />
 </div>

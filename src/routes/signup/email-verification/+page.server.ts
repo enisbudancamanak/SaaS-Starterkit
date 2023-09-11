@@ -1,13 +1,16 @@
 import {
   validateVerificationToken,
   generateVerificationToken,
+  generateEmailVerificationToken,
+  sendVerificationEmail,
 } from '$lib/server/token'
 import type { Actions } from './$types'
 import { auth } from '$lib/server/lucia'
-import { redirect } from 'sveltekit-flash-message/server'
+import { redirect, setFlash } from 'sveltekit-flash-message/server'
 import { fail } from '@sveltejs/kit'
+import type { PageServerLoad } from './$types'
 
-export const load = async (event) => {
+export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
 
   if (session) {
@@ -31,6 +34,24 @@ export const actions: Actions = {
     throw redirect(
       '/signup',
       { type: 'success', message: 'successfully logged out!' },
+      event
+    )
+  },
+
+  resendCode: async (event) => {
+    const session = await event.locals.auth.validate()
+    if (!session) return fail(401)
+
+    const user = await auth.getUser(session.user.userId)
+
+    // send verification code
+    const code = await generateVerificationToken(user.userId)
+    const token = await generateEmailVerificationToken(user.userId)
+
+    await sendVerificationEmail(code, token)
+
+    setFlash(
+      { message: 'Resent code, check your Spam!', type: 'success' },
       event
     )
   },

@@ -2,11 +2,14 @@
   // Icons
   import SpinnerIcon from '~icons/gg/spinner'
 
+  //@ts-ignore
+  import SvelteOtp from '@k4ung/svelte-otp'
+
+  let code = ''
+
   // UI
-  import * as Form from '$lib/components/ui/form'
   import { Button } from '$lib/components/ui/button'
   import { Input } from '$lib/components/ui/input'
-  import { goto } from '$app/navigation'
   import { enhance } from '$app/forms'
 
   // Utils
@@ -30,19 +33,41 @@
 </p>
 
 <!-- Form -->
-<form use:enhance method="post" action="?/validateCode">
-  <div class="grid gap-3">
-    <Input
-      id="code"
-      placeholder="Enter login code"
-      type="text"
-      name="code"
-      autocapitalize="none"
-      autocorrect="off"
-    />
-    <Button class="capitalize">continue</Button>
-  </div>
-</form>
+<div class="flex flex-col items-center gap-2">
+  <form use:enhance method="post" action="?/validateCode">
+    <div class="grid max-w-xs gap-3">
+      <SvelteOtp
+        wrapperClass="flex justify-center gap-2"
+        inputClass="text-2xl font-semibold bg-muted-foreground/20 rounded-sm numberOnly focus:ring-2 focus:ring-secondary w-full h-16 margin-auto text-center"
+        numOfInputs={6}
+        numberOnly={true}
+        disableDefaultStyle={true}
+        bind:value={code}
+      />
+
+      <Input
+        id="code"
+        type="text"
+        name="code"
+        autocapitalize="none"
+        autocorrect="off"
+        class="hidden"
+        bind:value={code}
+      />
+      <Button class="capitalize">continue</Button>
+    </div>
+  </form>
+
+  <!-- Wrong email? -->
+  <form action="?/resendCode" method="post" use:enhance>
+    <p class="text-sm text-center text-muted-foreground">
+      Didn't receive a code?
+      <button type="submit" class="font-semibold link">
+        Click to resend
+      </button>
+    </p>
+  </form>
+</div>
 
 <!-- Wrong email? -->
 <form action="?/logout" method="post" use:enhance>

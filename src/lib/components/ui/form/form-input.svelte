@@ -6,10 +6,12 @@
   type $$Props = HTMLInputAttributes
   type $$Events = InputEvents
 
-  const { attrStore, value } = getFormField()
+  const { attrStore, value, errors } = getFormField()
 </script>
 
+<!-- class added -->
 <Input
+  class={$errors ? 'border-destructive !ring-destructive' : ''}
   {...$attrStore}
   bind:value={$value}
   {...$$restProps}

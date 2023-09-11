@@ -3,8 +3,10 @@ import { prisma } from '$lib/server/prisma'
 import { auth } from '$lib/server/lucia'
 import { render } from 'svelte-email'
 import nodemailer from 'nodemailer'
-//@ts-ignore
+// @ts-ignore
 import VerificationCode from '$lib/emails/VerificationCode.svelte'
+// @ts-ignore
+import ResetPassword from '$lib/emails/ResetPassword.svelte'
 import { GMAIL_EMAIL, GMAIL_PASSWORD } from '$env/static/private'
 
 const EXPIRES_IN = 1000 * 60 * 5 //5 minutes
@@ -14,6 +16,10 @@ const verificationTimeout = new Map<
     triesLeft: number
   }
 >()
+
+/**
+ * Verification code token
+ */
 
 export const generateVerificationToken = async (user_id: string) => {
   const code = generateRandomString(6, '0123456789')
@@ -94,64 +100,9 @@ export const validateVerificationToken = async (
   })
 }
 
-export const sendVerificationCode = async (
-  code: string,
-  token: string | number
-) => {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: GMAIL_EMAIL,
-      pass: GMAIL_PASSWORD,
-    },
-  })
-
-  const emailHtml = render({
-    template: VerificationCode,
-    props: { code: code, token: token },
-  })
-
-  const options = {
-    from: GMAIL_EMAIL,
-    to: 'enis.budancamanak@hotmail.com',
-    subject: `${token} is your activation code`,
-    html: emailHtml,
-  }
-
-  console.log('email sent')
-
-  await transporter.sendMail(options)
-}
-
-export const generatePasswordResetToken = async (user_id: string) => {
-  const token = generateRandomString(63)
-
-  const storedUserTokens = await prisma.passwordResetToken.findMany({
-    where: {
-      user_id,
-    },
-  })
-
-  if (storedUserTokens.length > 0) {
-    const reusableStoredToken = storedUserTokens.find((token) => {
-      // check if expiration is within 1 hour
-      // and reuse the token if true
-      return isWithinExpiration(Number(token.expires) - EXPIRES_IN / 2)
-    })
-    if (reusableStoredToken) return reusableStoredToken.code
-  }
-  await prisma.verificationCode.create({
-    data: {
-      code: token,
-      expires: new Date().getTime() + EXPIRES_IN,
-      user_id: user_id,
-    },
-  })
-
-  return token
-}
+/**
+ * Email verification token
+ */
 
 export const generateEmailVerificationToken = async (user_id: string) => {
   const storedUserTokens = await prisma.emailVerificationToken.findMany({
@@ -206,4 +157,129 @@ export const validateEmailVerificationToken = async (token: string) => {
     throw new Error('Expired token')
   }
   return storedToken.user_id
+}
+
+/**
+ * Password reset token
+ */
+
+export const generatePasswordResetToken = async (userId: string) => {
+  const storedUserTokens = await prisma.passwordResetToken.findMany({
+    where: {
+      user_id: userId,
+    },
+  })
+
+  if (storedUserTokens.length > 0) {
+    const reusableStoredToken = storedUserTokens.find((token) => {
+      // check if expiration is within 1 hour
+      // and reuse the token if true
+      return isWithinExpiration(Number(token.expires) - EXPIRES_IN * 5) //Withing 25 minutes
+    })
+    if (reusableStoredToken) return reusableStoredToken.id
+  }
+  const token = generateRandomString(63)
+
+  await prisma.passwordResetToken.create({
+    data: {
+      token: token,
+      expires: new Date().getTime() + EXPIRES_IN,
+      user_id: userId,
+    },
+  })
+  console.log(token)
+
+  return token
+}
+
+export const validatePasswordResetToken = async (token: string) => {
+  const storedToken = await prisma.passwordResetToken
+    .findFirst({
+      where: {
+        token: token,
+      },
+    })
+    .then(async (storedToken) => {
+      if (!storedToken) throw new Error('Invalid token')
+
+      if (storedToken)
+        prisma.passwordResetToken.delete({
+          where: {
+            user_id: storedToken.user_id,
+          },
+        })
+      return storedToken
+    })
+
+  // bigint => number conversion
+  if (!isWithinExpiration(Number(storedToken.expires))) {
+    throw new Error('Expired token')
+  }
+
+  return storedToken.user_id
+}
+
+/**
+ * Send password reset email
+ */
+
+export const sendPasswordResetEmail = async (token: string | number) => {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: GMAIL_EMAIL,
+      pass: GMAIL_PASSWORD,
+    },
+  })
+
+  const emailHtml = render({
+    template: ResetPassword,
+    props: { token: token },
+  })
+
+  const options = {
+    from: GMAIL_EMAIL,
+    to: 'enis.budancamanak@hotmail.com',
+    subject: `Reset your password`,
+    html: emailHtml,
+  }
+
+  await transporter.sendMail(options)
+}
+
+/**
+ *
+ * Send verification email
+ *
+ */
+
+export const sendVerificationEmail = async (
+  code: string,
+  token: string | number
+) => {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: GMAIL_EMAIL,
+      pass: GMAIL_PASSWORD,
+    },
+  })
+
+  const emailHtml = render({
+    template: VerificationCode,
+    props: { code: code, token: token },
+  })
+
+  const options = {
+    from: GMAIL_EMAIL,
+    to: 'enis.budancamanak@hotmail.com',
+    subject: `${code} is your activation code`,
+    html: emailHtml,
+  }
+
+  await transporter.sendMail(options)
 }

@@ -5,7 +5,6 @@
   // UI
   import * as Form from '$lib/components/ui/form'
   import SocialLogins from '../social-logins.svelte'
-  import PasswordStrength from '../passwordStrength.svelte'
   import { cn } from '$lib/utils'
 
   // Utils
@@ -15,13 +14,11 @@
   let className: string | undefined | null = undefined
   export { className as class }
 
+  let passwordVisible = false
   export let form: SuperValidated<FormSchema>
-
-  let password: string = ''
-  let loading = false
 </script>
 
-<div class={cn('grid gap-6', className)} {...$$restProps}>
+<div class={cn('grid gap-4', className)} {...$$restProps}>
   <!-- Social Login -->
   <SocialLogins />
 
@@ -36,21 +33,39 @@
   </div>
 
   <!-- Form -->
-  <Form.Root method="POST" {form} schema={newUserSchema} let:config>
+  <Form.Root method="POST" {form} schema={newUserSchema} let:config let:delayed>
     <Form.Field {config} name="email">
       <Form.Item>
-        <Form.Input type="email" placeholder="Enter your email address" />
+        <Form.Label>E-Mail</Form.Label>
+        <Form.Input
+          type="email"
+          placeholder="Enter your e-mail address"
+          disabled={delayed}
+        />
         <Form.Validation />
       </Form.Item>
     </Form.Field>
 
     <Form.Field {config} name="password">
       <Form.Item>
-        <Form.Input type="password" placeholder="Enter your password" />
+        <Form.Label>Password</Form.Label>
+        <div class="relative flex">
+          <Form.Input
+            type={passwordVisible ? 'text' : 'password'}
+            placeholder="Enter your password"
+            disabled={delayed}
+          />
+          <Form.PasswordToggle bind:passwordVisible />
+        </div>
         <Form.Validation />
         <!-- <PasswordStrength {password} /> -->
       </Form.Item>
     </Form.Field>
-    <Form.Button class="w-full">Continue</Form.Button>
+    <Form.Button class="w-full" disabled={delayed}>
+      {#if delayed}
+        <SpinnerIcon class="w-4 h-4 mr-2 animate-spin" />
+      {/if}
+      Continue
+    </Form.Button>
   </Form.Root>
 </div>

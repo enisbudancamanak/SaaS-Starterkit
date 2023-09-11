@@ -2,8 +2,6 @@ import { auth } from '$lib/server/lucia'
 import { validateEmailVerificationToken } from '$lib/server/token'
 
 export const GET = async ({ params }) => {
-  console.log(params.token)
-
   const token = params.token
   try {
     const userId = await validateEmailVerificationToken(token)

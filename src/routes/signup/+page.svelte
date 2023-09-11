@@ -37,12 +37,12 @@
     <p class="px-8 text-sm text-center text-muted-foreground">
       Already have an Account?
       <button
-        class="underline link"
+        class="font-bold link"
         on:click={() => {
           goto('/login')
         }}
       >
-        Login
+        Login.
       </button>
     </p>
   </div>

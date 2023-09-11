@@ -2,27 +2,11 @@
   // Icons
   import RandomLogo from '~icons/fa6-solid/blog'
 
-  // UI
-
   // Server
   import EnterCodeForm from '$lib/components/login/enter-code-form.svelte'
-  import { enhance } from '$app/forms'
-  import { onMount } from 'svelte'
-  import toast from 'svelte-french-toast'
 
   // Utils
   export let data
-
-  // Sent email Toast
-  onMount(() => {
-    toast.success('email sent, check you inbox!', {
-      style: 'border: 1px solid #09090b; padding: 16px; color: #09090b;',
-      iconTheme: {
-        primary: '#09090b',
-        secondary: '#FAFAFA',
-      },
-    })
-  })
 </script>
 
 <div

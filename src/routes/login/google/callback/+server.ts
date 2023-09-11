@@ -37,7 +37,7 @@ export const GET = async ({ url, cookies, locals }) => {
       const existingUser = await getExistingUser()
       if (existingUser) return existingUser
       if (!googleUser.email_verified) {
-        throw error(404, 'Email not verified')
+        throw error(404, 'E-Mail not verified')
       }
       const existingDatabaseUserWithEmail = await getUserByEmail(
         googleUser.email

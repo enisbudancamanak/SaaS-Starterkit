@@ -15,6 +15,7 @@ import RadioGroup from './form-radio-group.svelte'
 import Select from './form-select.svelte'
 import SelectTrigger from './form-select-trigger.svelte'
 import Button from './form-button.svelte'
+import PasswordToggle from './form-password-toggle.svelte'
 
 const Root = FormPrimitive.Root
 const Field = FormPrimitive.Field
@@ -56,6 +57,7 @@ export {
   SelectTrigger,
   NativeSelect,
   NativeRadio,
+  PasswordToggle,
   //
   Root as Form,
   Field as FormField,

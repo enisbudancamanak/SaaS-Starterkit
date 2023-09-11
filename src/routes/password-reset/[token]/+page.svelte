@@ -3,13 +3,10 @@
   import RandomLogo from '~icons/fa6-solid/blog'
 
   // UI
-  import LoginForm from '$lib/components/login/login-form.svelte'
-  import { goto } from '$app/navigation'
+  import type { PageData } from './$types'
+  import PasswordInputChangeForm from '$lib/components/login/password-input-change-form.svelte'
 
-  // Utils
-  import { superForm } from 'sveltekit-superforms/client'
-
-  export let data
+  export let data: PageData
 </script>
 
 <div
@@ -23,25 +20,17 @@
       <div class="flex flex-col items-center justify-center w-full gap-4">
         <RandomLogo class="w-12 h-12 -mt-6" />
         <h1 class="mb-6 text-3xl font-bold tracking-tight text-center">
-          Welcome back to SaaS-Kit!
+          Create new Password
         </h1>
       </div>
 
-      <!-- Login Form -->
-      <LoginForm bind:form={data.form} />
-
-      <!-- No Account? -->
-      <p class="px-8 text-sm text-center text-muted-foreground">
-        Don't have an account yet?
-        <button
-          class="font-bold link"
-          on:click={() => {
-            goto('/signup')
-          }}
-        >
-          Sign up.
-        </button>
+      <!-- Sent to email@email.de -->
+      <p class="text-sm text-center text-muted-foreground">
+        Please enter your new password.
       </p>
+
+      <!-- Form -->
+      <PasswordInputChangeForm bind:form={data.form} email={data.email} />
     </div>
   </div>
 

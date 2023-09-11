@@ -4,10 +4,10 @@ import { auth } from '$lib/server/lucia'
 import {
   generateEmailVerificationToken,
   generateVerificationToken,
-  sendVerificationCode,
+  sendVerificationEmail,
 } from '$lib/server/token'
 import type { Actions, PageServerLoad } from './$types'
-import { redirect } from 'sveltekit-flash-message/server'
+import { redirect, setFlash } from 'sveltekit-flash-message/server'
 import { fail } from '@sveltejs/kit'
 import { LuciaError } from 'lucia'
 
@@ -57,7 +57,12 @@ export const actions: Actions = {
       const code = await generateVerificationToken(user.userId)
       const token = await generateEmailVerificationToken(user.userId)
 
-      await sendVerificationCode(code, token)
+      await sendVerificationEmail(code, token)
+
+      setFlash(
+        { message: 'E-Mail sent, check your inbox!', type: 'success' },
+        event
+      )
 
       return { form }
     } catch (e: any) {
@@ -87,15 +92,16 @@ export const actions: Actions = {
         const code = await generateVerificationToken(user.id)
         const token = await generateEmailVerificationToken(user.id)
 
-        await sendVerificationCode(code, token)
+        await sendVerificationEmail(code, token)
       }
 
       //E-Mail already taken
       else if (
         e != typeof LuciaError &&
         e.message.includes('Unique constraint failed on the fields: (`email`)')
-      )
-        return setError(form, 'email', 'Email already taken')
+      ) {
+        return setError(form, 'email', 'E-Mail already taken')
+      }
     }
   },
 }

@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit'
 import { auth } from '$lib/server/lucia'
-import { superValidate } from 'sveltekit-superforms/server'
+import { setError, superValidate } from 'sveltekit-superforms/server'
 import { loginSchema } from '$lib/schema'
 
 import type { PageServerLoad, Actions } from './$types'
@@ -45,16 +45,17 @@ export const actions: Actions = {
 
       return { form }
     } catch (e: any) {
-      if (
-        e.message === 'AUTH_INVALID_KEY_ID' ||
-        e.message === 'AUTH_INVALID_PASSWORD'
-      ) {
-        // user does not exist
-        // or invalid password
-        throw redirect(
-          { type: 'error', message: 'Incorrect email or password' },
-          event
-        )
+      if (e.message === 'AUTH_INVALID_PASSWORD') {
+        // user does not exist or invalid password
+        return setError(form, 'password', 'Wrong password. Try again.')
+      } else if (e.message === 'AUTH_INVALID_KEY_ID') {
+        // user does not exist or invalid password
+        return setError(form, 'email', 'Incorrect email')
+
+        // throw redirect(
+        //   { type: 'error', message: 'Incorrect email or password' },
+        //   event
+        // )
       }
       throw redirect(
         { type: 'error', message: 'An unknown error occurred' },

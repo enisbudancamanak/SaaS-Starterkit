@@ -7,10 +7,22 @@
   // Server
   import EnterCodeForm from '$lib/components/login/enter-code-form.svelte'
   import { enhance } from '$app/forms'
+  import { onMount } from 'svelte'
+  import toast from 'svelte-french-toast'
 
   // Utils
-
   export let data
+
+  // Sent email Toast
+  onMount(() => {
+    toast.success('email sent, check you inbox!', {
+      style: 'border: 1px solid #09090b; padding: 16px; color: #09090b;',
+      iconTheme: {
+        primary: '#09090b',
+        secondary: '#FAFAFA',
+      },
+    })
+  })
 </script>
 
 <div
@@ -31,13 +43,6 @@
       <!-- Login Form -->
       <EnterCodeForm email={data?.session?.user?.email} />
     </div>
-
-    <form action="?/logout" method="post" class="pt-8" use:enhance>
-      <p class="px-8 text-sm text-center text-muted-foreground">
-        Wrong email?
-        <button type="submit" class="underline link"> Logout </button>
-      </p>
-    </form>
   </div>
 
   <!-- Right Side (Image) -->

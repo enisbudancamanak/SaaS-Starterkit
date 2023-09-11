@@ -59,6 +59,9 @@
         <Form.Item>
           <Form.Input type="password" placeholder="Enter your password" />
           <!-- <Form.Validation /> -->
+          <p class="text-sm text-left text-secondary-foreground">
+            <a href="/password-reset">Forgot Password?</a>
+          </p>
         </Form.Item>
       </Form.Field>
       <Form.Button class="w-full">Continue</Form.Button>

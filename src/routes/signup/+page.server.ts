@@ -1,10 +1,15 @@
 import { setError, superValidate } from 'sveltekit-superforms/server'
 import { newUserSchema } from '$lib/schema'
 import { auth } from '$lib/server/lucia'
-import { generateEmailVerificationToken } from '$lib/server/token'
+import {
+  generateEmailVerificationToken,
+  generateVerificationToken,
+  sendVerificationCode,
+} from '$lib/server/token'
 import type { Actions, PageServerLoad } from './$types'
 import { redirect } from 'sveltekit-flash-message/server'
 import { fail } from '@sveltejs/kit'
+import { LuciaError } from 'lucia'
 
 export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
@@ -39,7 +44,7 @@ export const actions: Actions = {
         },
         attributes: {
           email: form.data.email.toLowerCase(),
-          email_verified: Number(0),
+          email_verified: false,
         },
       })
 
@@ -48,20 +53,46 @@ export const actions: Actions = {
         attributes: {},
       })
       event.locals.auth.setSession(session) // set session cookie
+
+      const code = await generateVerificationToken(user.userId)
       const token = await generateEmailVerificationToken(user.userId)
 
-      // TODO
-      // throw redirect(
-      //   { type: 'success', message: 'Email sent, check your Inbox!' },
-      //   event
-      // )
+      await sendVerificationCode(code, token)
 
-      // await sendEmailVerificationLink(token)
       return { form }
-    } catch (e) {
-      console.log(e)
+    } catch (e: any) {
+      // Check if user exists but without email verification
+      const user = await prisma.user.findFirst({
+        where: {
+          email: form.data.email.toLowerCase(),
+          email_verified: false,
+        },
+      })
 
-      if (
+      // if it exists create a session and sendVerificationCode
+      if (user) {
+        // invalidate all sessions
+        await auth.invalidateAllUserSessions(user.id)
+        // update password
+        await auth.updateKeyPassword('email', user.email, form.data.password)
+
+        // create session
+        const session = await auth.createSession({
+          userId: user.id,
+          attributes: {},
+        })
+        event.locals.auth.setSession(session) // set session cookie
+
+        // send verification code
+        const code = await generateVerificationToken(user.id)
+        const token = await generateEmailVerificationToken(user.id)
+
+        await sendVerificationCode(code, token)
+      }
+
+      //E-Mail already taken
+      else if (
+        e != typeof LuciaError &&
         e.message.includes('Unique constraint failed on the fields: (`email`)')
       )
         return setError(form, 'email', 'Email already taken')

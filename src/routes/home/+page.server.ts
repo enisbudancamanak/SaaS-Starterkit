@@ -22,6 +22,7 @@ export const actions: Actions = {
     const session = await event.locals.auth.validate()
     if (!session) return fail(401)
     await auth.invalidateSession(session.sessionId) // invalidate session
+    await auth.deleteDeadUserSessions(session.userId)
     event.locals.auth.setSession(null) // remove cookie
 
     throw redirect(

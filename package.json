@@ -37,6 +37,8 @@
     "formsnap": "^0.0.9",
     "lucia": "^2.4.2",
     "lucide-svelte": "^0.274.0",
+    "nodemailer": "^6.9.5",
+    "svelte-email": "^0.0.4",
     "svelte-french-toast": "^1.2.0",
     "tailwind-merge": "^1.14.0",
     "tailwind-variants": "^0.1.14"

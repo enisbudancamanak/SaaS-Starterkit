@@ -25,14 +25,13 @@ export const actions: Actions = {
   default: async (event) => {
     const form = await superValidate(event.request, loginSchema)
 
-    // if (!form.valid) {
-    //   return fail(400, {
-    //     form,
-    //   })
-    // }
+    if (!form.valid) {
+      return fail(400, {
+        form,
+      })
+    }
+
     try {
-      // find user by key
-      // and validate password
       const key = await auth.useKey(
         'email',
         form.data.email.toLowerCase(),
@@ -43,7 +42,9 @@ export const actions: Actions = {
         attributes: {},
       })
       event.locals.auth.setSession(session) // set session cookie
-    } catch (e) {
+
+      return { form }
+    } catch (e: any) {
       if (
         e.message === 'AUTH_INVALID_KEY_ID' ||
         e.message === 'AUTH_INVALID_PASSWORD'

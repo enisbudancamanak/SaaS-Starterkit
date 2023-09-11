@@ -1,6 +1,6 @@
 import {
-  validateEmailVerificationToken,
-  generateEmailVerificationToken,
+  validateVerificationToken,
+  generateVerificationToken,
 } from '$lib/server/token'
 import type { Actions } from './$types'
 import { auth } from '$lib/server/lucia'
@@ -25,26 +25,14 @@ export const actions: Actions = {
     const session = await event.locals.auth.validate()
     if (!session) return fail(401)
     await auth.invalidateSession(session.sessionId) // invalidate session
+    await auth.deleteDeadUserSessions(session.userId) //delete dead user sessions
     event.locals.auth.setSession(null) // remove cookie
 
     throw redirect(
-      '/login',
+      '/signup',
       { type: 'success', message: 'successfully logged out!' },
       event
     )
-  },
-  resendCode: async (event) => {
-    const session = await event.locals.auth.validate()
-
-    if (session) {
-      const token = await generateEmailVerificationToken(session.user.userId)
-      // await sendEmailVerificationLink(token)
-
-      throw redirect(
-        { type: 'success', message: 'Email sent, check your inbox!' },
-        event
-      )
-    }
   },
   validateCode: async (event) => {
     const { code } = Object.fromEntries(
@@ -56,19 +44,19 @@ export const actions: Actions = {
       const session = await event.locals.auth.validate()
 
       if (session) {
-        await validateEmailVerificationToken(session.user.userId, code)
-      }
+        await validateVerificationToken(session.user.userId, code)
 
-      throw redirect(
-        '/home',
-        { type: 'success', message: 'Successfully logged in!' },
-        event
-      )
-    } catch (e) {
+        throw redirect(
+          '/home',
+          { type: 'success', message: 'Successfully logged in!' },
+          event
+        )
+      }
+    } catch (e: any) {
       if (
-        e.message === 'Invalid token' ||
-        e.message === 'Token expired, check your inbox' ||
-        e.message === 'Too many requests, check your inbox'
+        e.message === 'Invalid code' ||
+        e.message === 'Code expired, check your inbox' ||
+        e.message === 'Too many requests!'
       )
         throw redirect({ type: 'error', message: e.message }, event)
     }

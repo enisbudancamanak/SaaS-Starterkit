@@ -16,7 +16,9 @@
   export { className as class }
 
   export let form: SuperValidated<FormSchema>
+
   let password: string = ''
+  let loading = false
 </script>
 
 <div class={cn('grid gap-6', className)} {...$$restProps}>

@@ -8,9 +8,6 @@
   import { goto } from '$app/navigation'
   import type { PageData } from './$types'
 
-  // Utils
-  let clickedContinue = false
-
   export let data: PageData
 </script>
 
@@ -31,7 +28,7 @@
 
       <!-- Login Form -->
       {#if !data?.session?.user?.email}
-        <SignupForm bind:clickedContinue form={data.form} />
+        <SignupForm form={data.form} />
       {:else}
         <EnterCodeForm email={data?.session?.user?.email} />
       {/if}

@@ -14,7 +14,7 @@ datasource db {
 model User {
   id              String      @id @unique
   email           String      @unique
-  email_verified  Int         @default(0)
+  email_verified  Boolean     @default(false)
   auth_session    Session[]
   key             Key[]
 }
@@ -23,6 +23,20 @@ model VerificationCode {
   id        Int       @id @default(autoincrement())
   user_id   String
   code      String
+  expires   BigInt
+}
+
+model EmailVerificationToken {
+  id       Int       @id @default(autoincrement())
+  user_id  String
+  token    String
+  expires  BigInt
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  user_id   String
+  token     String
   expires   BigInt
 }
 

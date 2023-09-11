@@ -63,7 +63,7 @@ export const GET = async ({ url, cookies, locals }) => {
       return await createUser({
         attributes: {
           email: primaryEmail.email.toLowerCase(),
-          email_verified: Number(1),
+          email_verified: true,
         },
       })
     }

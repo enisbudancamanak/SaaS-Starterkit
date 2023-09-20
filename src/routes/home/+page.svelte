@@ -6,7 +6,7 @@
 </script>
 
 {#if data.email}
-  <WelcomeDialogForm />
+  <!-- <WelcomeDialogForm /> -->
   <h1>Profile</h1>
   <p>User id: {data?.userId}</p>
   <p>E-Mail: {data?.email}</p>

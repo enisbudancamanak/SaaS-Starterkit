@@ -5,6 +5,8 @@
   import { beforeNavigate, onNavigate } from '$app/navigation'
   import { page } from '$app/stores'
   import { initFlash } from 'sveltekit-flash-message/client'
+  import ThemeSwitch from '$lib/components/themeSwitch.svelte'
+  import CookieBanner from '$lib/components/cookieBanner.svelte'
 
   // https://svelte.dev/blog/view-transitions
   onNavigate((navigation) => {
@@ -45,6 +47,8 @@
   }
 </script>
 
+<CookieBanner />
+<ThemeSwitch />
 <Toaster />
 <slot />
 

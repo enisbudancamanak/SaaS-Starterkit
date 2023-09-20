@@ -4,7 +4,7 @@ import { setError, superValidate } from 'sveltekit-superforms/server'
 import { loginSchema } from '$lib/schema'
 
 import type { PageServerLoad, Actions } from './$types'
-import { redirect } from 'sveltekit-flash-message/server'
+import { redirect, setFlash } from 'sveltekit-flash-message/server'
 
 export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
@@ -42,6 +42,8 @@ export const actions: Actions = {
         attributes: {},
       })
       event.locals.auth.setSession(session) // set session cookie
+
+      setFlash({ type: 'success', message: 'Successfully logged in' }, event)
 
       return { form }
     } catch (e: any) {

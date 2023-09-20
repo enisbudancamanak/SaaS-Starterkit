@@ -22,3 +22,27 @@
     <EyeClosed class="w-6 h-7" />
   {/if}
 </Button>
+<!-- 
+
+<div class="absolute right-0">
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      <Button
+        type="button"
+        variant="none"
+        on:click={() => {
+          passwordVisible = !passwordVisible
+        }}
+      >
+        {#if passwordVisible}
+          <EyeOpen class="w-6 h-6" />
+        {:else}
+          <EyeClosed class="w-6 h-7" />
+        {/if}
+      </Button>
+    </Tooltip.Trigger>
+    <Tooltip.Content>
+      <p>Add to library</p>
+    </Tooltip.Content>
+  </Tooltip.Root>
+</div> -->

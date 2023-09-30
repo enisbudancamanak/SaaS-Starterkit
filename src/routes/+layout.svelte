@@ -1,4 +1,5 @@
 <script>
+  import '../fonts.css'
   import '../app.postcss'
 
   import toast, { Toaster } from 'svelte-french-toast'
@@ -10,9 +11,11 @@
 
   // https://svelte.dev/blog/view-transitions
   onNavigate((navigation) => {
+    // @ts-ignore
     if (!document.startViewTransition) return
 
     return new Promise((resolve) => {
+      // @ts-ignore
       document.startViewTransition(async () => {
         resolve()
         await navigation.complete
@@ -21,7 +24,7 @@
   })
 
   //Flash Messages
-  // ALERT-TODO: https://www.youtube.com/watch?v=hB6OkaYWS5I
+  // https://www.youtube.com/watch?v=hB6OkaYWS5I
   const flash = initFlash(page)
 
   beforeNavigate((nav) => {
@@ -47,17 +50,12 @@
   }
 </script>
 
-<CookieConsent />
-<!-- <CookieBanner /> -->
-<ThemeSwitch />
+<!-- <CookieConsent /> -->
+<!-- <ThemeSwitch /> -->
 <Toaster />
 <slot />
 
 <style>
-  :global(*) {
-    font-family: 'Nunito Sans', sans-serif !important;
-  }
-
   @keyframes fade-in {
     from {
       opacity: 0;

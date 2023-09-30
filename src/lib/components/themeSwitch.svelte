@@ -6,33 +6,55 @@
   import SunIcon from '~icons/mdi/white-balance-sunny'
   import MoonIcon from '~icons/mdi/moon-waning-crescent'
 
-  let darkMode = true
+  let darkMode = localStorage.getItem('dark-mode')
+    ? localStorage.getItem('dark-mode')
+    : window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'enabled'
+    : 'disabled'
+
+  const enableDarkMode = () => {
+    document.documentElement.classList.add('dark')
+    localStorage.setItem('dark-mode', 'enabled')
+  }
+
+  const disableDarkMode = () => {
+    document.documentElement.classList.remove('dark')
+    localStorage.setItem('dark-mode', 'disabled')
+  }
+
+  if (darkMode === 'enabled') {
+    enableDarkMode() // set state of darkMode on page load
+  } else if (darkMode === 'disabled') {
+    disableDarkMode()
+  }
 
   function handleSwitchDarkMode() {
-    darkMode = !darkMode
-
-    darkMode
-      ? document.documentElement.classList.add('dark')
-      : document.documentElement.classList.remove('dark')
-  }
-
-  if (browser) {
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.documentElement.classList.add('dark')
-      darkMode = true
+    darkMode = localStorage.getItem('dark-mode') as string
+    if (darkMode === 'disabled') {
+      enableDarkMode()
     } else {
-      document.documentElement.classList.remove('dark')
-      darkMode = false
+      disableDarkMode()
     }
   }
+
+  // if (browser) {
+  //   // LocalStorage
+  //   if (localStorage.getItem('darkMode') === null) {
+  //     localStorage.setItem('darkMode', darkMode.toString())
+  //   } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  //     document.documentElement.classList.add('dark')
+  //     darkMode = true
+  //   } else {
+  //     document.documentElement.classList.remove('dark')
+  //     darkMode = false
+  //   }
+  // }
 </script>
 
-<div class="absolute z-50 top-2 right-2">
-  <Button on:click={handleSwitchDarkMode} class="w-8 h-8 ">
-    {#if darkMode}
-      <SunIcon class="absolute w-5 h-5" />
-    {:else}
-      <MoonIcon class="absolute w-5 h-5 " />
-    {/if}
-  </Button>
-</div>
+<Button on:click={handleSwitchDarkMode} class="w-8 h-8">
+  {#if darkMode === 'enabled'}
+    <SunIcon class="absolute w-5 h-5" />
+  {:else}
+    <MoonIcon class="absolute w-5 h-5 " />
+  {/if}
+</Button>

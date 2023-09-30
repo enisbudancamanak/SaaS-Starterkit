@@ -2,12 +2,11 @@ import { generateRandomString, isWithinExpiration } from 'lucia/utils'
 import { prisma } from '$lib/server/prisma'
 import { auth } from '$lib/server/lucia'
 import { render } from 'svelte-email'
-import nodemailer from 'nodemailer'
 // @ts-ignore
-import VerificationCode from '$lib/emails/VerificationCode.svelte'
+import VerificationCode from '$lib/emails/components/VerificationCode.svelte'
 // @ts-ignore
-import ResetPassword from '$lib/emails/ResetPassword.svelte'
-import { GMAIL_EMAIL, GMAIL_PASSWORD } from '$env/static/private'
+import ResetPassword from '$lib/emails/components/ResetPassword.svelte'
+import { sendEmail } from '$lib/emails/send'
 
 const EXPIRES_IN = 1000 * 60 * 5 //5 minutes
 const verificationTimeout = new Map<
@@ -144,6 +143,7 @@ export const validateEmailVerificationToken = async (token: string) => {
 
       if (storedToken) {
         prisma.emailVerificationToken.delete({
+          // @ts-ignore
           where: {
             user_id: storedToken.user_id,
           },
@@ -204,6 +204,7 @@ export const validatePasswordResetToken = async (token: string) => {
 
       if (storedToken)
         prisma.passwordResetToken.delete({
+          // @ts-ignore
           where: {
             user_id: storedToken.user_id,
           },
@@ -224,29 +225,37 @@ export const validatePasswordResetToken = async (token: string) => {
  */
 
 export const sendPasswordResetEmail = async (token: string | number) => {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: GMAIL_EMAIL,
-      pass: GMAIL_PASSWORD,
-    },
-  })
+  // const transporter = nodemailer.createTransport({
+  //   host: 'smtp.gmail.com',
+  //   port: 587,
+  //   secure: false,
+  //   auth: {
+  //     user: GMAIL_EMAIL,
+  //     pass: GMAIL_PASSWORD,
+  //   },
+  // })
 
   const emailHtml = render({
     template: ResetPassword,
     props: { token: token },
   })
 
-  const options = {
-    from: GMAIL_EMAIL,
+  await sendEmail({
+    from: 'enis.budancamanak@hotmail.com',
     to: 'enis.budancamanak@hotmail.com',
-    subject: `Reset your password`,
+    subject: 'Reset your password',
     html: emailHtml,
-  }
+  })
 
-  await transporter.sendMail(options)
+  // const options = {
+  //   from: GMAIL_EMAIL,
+  //   to: 'enis.budancamanak@hotmail.com',
+  //   subject: `Reset your password`,
+  //   html: emailHtml,
+
+  // }
+
+  // await transporter.sendMail(options)
 }
 
 /**
@@ -259,27 +268,34 @@ export const sendVerificationEmail = async (
   code: string,
   token: string | number
 ) => {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: GMAIL_EMAIL,
-      pass: GMAIL_PASSWORD,
-    },
-  })
+  // const transporter = nodemailer.createTransport({
+  //   host: 'smtp.gmail.com',
+  //   port: 587,
+  //   secure: false,
+  //   auth: {
+  //     user: GMAIL_EMAIL,
+  //     pass: GMAIL_PASSWORD,
+  //   },
+  // })
 
   const emailHtml = render({
     template: VerificationCode,
     props: { code: code, token: token },
   })
 
-  const options = {
-    from: GMAIL_EMAIL,
-    to: 'enis.budancamanak@hotmail.com',
-    subject: `${code} is your activation code`,
-    html: emailHtml,
-  }
+  // const options = {
+  //   from: GMAIL_EMAIL,
+  //   to: 'enis.budancamanak@hotmail.com',
+  //   subject: `${code} is your activation code`,
+  //   html: emailHtml,
+  // }
 
-  await transporter.sendMail(options)
+  // await transporter.sendMail(options)
+
+  await sendEmail({
+    from: 'enis.budancamanak@hotmail.com',
+    to: 'enis.budancamanak@hotmail.com',
+    subject: 'Verify Your Email Address',
+    html: emailHtml,
+  })
 }

@@ -55,6 +55,8 @@ const config = {
       },
       fontFamily: {
         sans: [...fontFamily.sans],
+        satoshi: ['Satoshi', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
       },
     },
   },

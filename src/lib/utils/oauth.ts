@@ -7,8 +7,6 @@ export async function handleRequest<T>(request: Request) {
   const response = await fetch(request)
 
   if (!response.ok) {
-    console.log(response.status, response.statusText)
-
     throw new OAuthRequestError(request, response)
   }
 

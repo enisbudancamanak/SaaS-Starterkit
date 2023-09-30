@@ -11,6 +11,7 @@ export const newUserSchema = z.object({
 export const loginSchema = z.object({
   email: z.string().email({ message: 'E-Mail must be a valid email address' }),
   password: z.string().min(2, 'Please type your password'),
+  checkbox: z.boolean(),
 })
 
 export const enterCodeSchema = z.object({

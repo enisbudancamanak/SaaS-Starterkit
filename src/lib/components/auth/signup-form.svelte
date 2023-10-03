@@ -1,6 +1,6 @@
 <script lang="ts">
   // Icons
-  import SpinnerIcon from '~icons/gg/spinner'
+  import Spinner from '~icons/svg-spinners/180-ring-with-bg'
 
   // UI
   import * as Form from '$lib/components/ui/form'
@@ -33,14 +33,20 @@
   </div>
 
   <!-- Form -->
-  <Form.Root method="POST" {form} schema={newUserSchema} let:config let:delayed>
+  <Form.Root
+    method="POST"
+    {form}
+    schema={newUserSchema}
+    let:config
+    let:submitting
+  >
     <Form.Field {config} name="email">
       <Form.Item>
         <Form.Label>E-Mail</Form.Label>
         <Form.Input
           type="email"
           placeholder="Enter your e-mail address"
-          disabled={delayed}
+          disabled={submitting}
         />
         <Form.Validation />
       </Form.Item>
@@ -53,7 +59,7 @@
           <Form.Input
             type={passwordVisible ? 'text' : 'password'}
             placeholder="Enter your password"
-            disabled={delayed}
+            disabled={submitting}
           />
           <Form.PasswordToggle bind:passwordVisible />
         </div>
@@ -61,9 +67,9 @@
         <!-- <PasswordStrength {password} /> -->
       </Form.Item>
     </Form.Field>
-    <Form.Button class="w-full" disabled={delayed}>
-      {#if delayed}
-        <SpinnerIcon class="w-4 h-4 mr-2 animate-spin" />
+    <Form.Button class="w-full" disabled={submitting}>
+      {#if submitting}
+        <Spinner class="w-4 h-4 mr-2" />
       {/if}
       Continue
     </Form.Button>

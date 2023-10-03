@@ -36,7 +36,7 @@
     switch ($flash.type) {
       case 'success':
         toast.success($flash.message, {
-          style: 'border: 1px solid #09090b; padding: 16px; color: #09090b;',
+          style: 'padding: 16px; color: #09090b;',
           iconTheme: {
             primary: '#09090b',
             secondary: '#FAFAFA',
@@ -51,8 +51,10 @@
 </script>
 
 <!-- <CookieConsent /> -->
-<!-- <ThemeSwitch /> -->
 <Toaster />
+<div class="absolute top-4 right-4">
+  <ThemeSwitch />
+</div>
 <slot />
 
 <style>

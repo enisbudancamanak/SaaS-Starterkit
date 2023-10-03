@@ -1,7 +1,10 @@
-<script>
+<script lang="ts">
   import Nav from '$lib/components/nav.svelte'
   import ProfileMenu from '$lib/components/profileMenu.svelte'
   import ThemeSwitch from '$lib/components/themeSwitch.svelte'
+  import type { PageData } from '../$types'
+
+  export let data: PageData
 </script>
 
 <Nav />

@@ -18,11 +18,12 @@
 
   import { Button } from '$lib/components/ui/button'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
+  import { enhance } from '$app/forms'
 </script>
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger asChild let:builder>
-    <Button builders={[builder]} variant="outline">Open</Button>
+    <Button builders={[builder]} variant="default">Open</Button>
   </DropdownMenu.Trigger>
   <DropdownMenu.Content class="w-56">
     <DropdownMenu.Label>My Account</DropdownMenu.Label>
@@ -31,22 +32,18 @@
       <DropdownMenu.Item>
         <User class="w-4 h-4 mr-2" />
         <span>Profile</span>
-        <DropdownMenu.Shortcut>⇧⌘P</DropdownMenu.Shortcut>
       </DropdownMenu.Item>
       <DropdownMenu.Item>
         <CreditCard class="w-4 h-4 mr-2" />
         <span>Billing</span>
-        <DropdownMenu.Shortcut>⌘B</DropdownMenu.Shortcut>
       </DropdownMenu.Item>
       <DropdownMenu.Item>
         <Settings class="w-4 h-4 mr-2" />
         <span>Settings</span>
-        <DropdownMenu.Shortcut>⌘S</DropdownMenu.Shortcut>
       </DropdownMenu.Item>
       <DropdownMenu.Item>
         <Keyboard class="w-4 h-4 mr-2" />
         <span>Keyboard shortcuts</span>
-        <DropdownMenu.Shortcut>⌘K</DropdownMenu.Shortcut>
       </DropdownMenu.Item>
     </DropdownMenu.Group>
     <DropdownMenu.Separator />
@@ -78,7 +75,6 @@
       <DropdownMenu.Item>
         <Plus class="w-4 h-4 mr-2" />
         <span>New Team</span>
-        <DropdownMenu.Shortcut>⌘+T</DropdownMenu.Shortcut>
       </DropdownMenu.Item>
     </DropdownMenu.Group>
     <DropdownMenu.Separator />
@@ -97,8 +93,10 @@
     <DropdownMenu.Separator />
     <DropdownMenu.Item>
       <LogOut class="w-4 h-4 mr-2" />
-      <span>Log out</span>
-      <DropdownMenu.Shortcut>⇧⌘Q</DropdownMenu.Shortcut>
+
+      <form action="?/logout" method="post" use:enhance>
+        <button type="submit"> Logout </button>
+      </form>
     </DropdownMenu.Item>
   </DropdownMenu.Content>
 </DropdownMenu.Root>

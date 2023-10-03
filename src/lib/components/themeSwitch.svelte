@@ -51,7 +51,10 @@
   // }
 </script>
 
-<Button on:click={handleSwitchDarkMode} class="w-8 h-8">
+<Button
+  on:click={handleSwitchDarkMode}
+  class="flex items-center justify-center w-full"
+>
   {#if darkMode === 'enabled'}
     <SunIcon class="absolute w-5 h-5" />
   {:else}

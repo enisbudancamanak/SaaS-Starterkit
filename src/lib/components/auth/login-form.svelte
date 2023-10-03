@@ -1,6 +1,7 @@
 <script lang="ts">
   // Icons
   import EmailIcon from '~icons/mdi/email'
+  import Spinner from '~icons/svg-spinners/180-ring-with-bg'
 
   // UI
   import SocialLogins from './social-logins.svelte'
@@ -8,8 +9,6 @@
   import { Button } from '$lib/components/ui/button'
   import { cn } from '$lib/utils'
   import { loginSchema } from '$lib/schema'
-  import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte'
-  import Label from '$lib/components/ui/label/label.svelte'
 
   // Utils
   let className: string | undefined | null = undefined
@@ -91,7 +90,12 @@
         </Form.Field>
         <a href="/password-reset" class="text-sm link"> Forgot? </a>
       </div>
-      <Form.Button class="w-full" disabled={submitting}>Continue</Form.Button>
+      <Form.Button class="w-full" disabled={submitting}>
+        {#if submitting}
+          <Spinner class="w-4 h-4 mr-2" />
+        {/if}
+        Continue
+      </Form.Button>
     </Form.Root>
   {/if}
 </div>

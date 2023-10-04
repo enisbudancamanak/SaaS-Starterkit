@@ -11,7 +11,7 @@
 <div class="absolute top-4 right-4">
   <div class="flex items-center justify-center space-x-2">
     <ProfileMenu />
-    <ThemeSwitch />
+    <!-- <ThemeSwitch /> -->
   </div>
 </div>
 

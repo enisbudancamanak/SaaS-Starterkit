@@ -2,6 +2,8 @@
   import '../fonts.css'
   import '../app.postcss'
 
+  // import { Toaster, toast } from 'svelte-sonner'
+
   import toast, { Toaster } from 'svelte-french-toast'
   import { beforeNavigate, onNavigate } from '$app/navigation'
   import { page } from '$app/stores'
@@ -36,7 +38,7 @@
     switch ($flash.type) {
       case 'success':
         toast.success($flash.message, {
-          style: 'padding: 16px; color: #09090b;',
+          style: 'padding: 12px; color: #09090b;',
           iconTheme: {
             primary: '#09090b',
             secondary: '#FAFAFA',
@@ -44,17 +46,19 @@
         })
         break
       case 'error':
-        toast.error($flash.message)
+        toast.error($flash.message, {
+          style: 'padding: 12px; color: #09090b;',
+        })
         break
     }
   }
 </script>
 
 <!-- <CookieConsent /> -->
-<Toaster />
-<div class="absolute top-4 right-4">
+<Toaster position="bottom-right" />
+<!-- <div class="absolute top-4 right-4">
   <ThemeSwitch />
-</div>
+</div> -->
 <slot />
 
 <style>

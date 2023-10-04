@@ -53,10 +53,10 @@ export const actions: Actions = {
       })
       event.locals.auth.setSession(session) // set session cookie
 
-      const code = await generateVerificationToken(user.userId)
-      const token = await generateEmailVerificationToken(user.userId)
+      // const code = await generateVerificationToken(user.userId)
+      // const token = await generateEmailVerificationToken(user.userId)
 
-      await sendVerificationEmail(code, token)
+      // await sendVerificationEmail(code, token)
 
       setFlash(
         { message: 'E-Mail sent, check your inbox!', type: 'success' },
@@ -88,10 +88,11 @@ export const actions: Actions = {
         event.locals.auth.setSession(session) // set session cookie
 
         // send verification code
-        const code = await generateVerificationToken(user.id)
-        const token = await generateEmailVerificationToken(user.id)
 
-        await sendVerificationEmail(code, token)
+        // const code = await generateVerificationToken(user.id)
+        // const token = await generateEmailVerificationToken(user.id)
+
+        // await sendVerificationEmail(code, token)
       }
 
       //E-Mail already taken

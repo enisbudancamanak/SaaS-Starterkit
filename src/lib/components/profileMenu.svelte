@@ -18,12 +18,54 @@
 
   import { Button } from '$lib/components/ui/button'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
+  import * as Avatar from '$lib/components/ui/avatar'
+
   import { enhance } from '$app/forms'
+
+  let formLogout: HTMLFormElement
+
+  // dark mode toggle
+  let darkModePosition: string = localStorage.getItem('dark-mode')
+    ? (localStorage.getItem('dark-mode') as string)
+    : 'system'
+
+  $: if (darkModePosition) {
+    if (darkModePosition === 'system') {
+      localStorage.removeItem('dark-mode')
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? document.documentElement.classList.add('dark')
+        : document.documentElement.classList.remove('dark')
+    } else if (darkModePosition === 'enabled') {
+      enableDarkMode()
+    } else if (darkModePosition === 'disabled') {
+      disableDarkMode()
+    }
+  }
+
+  const enableDarkMode = () => {
+    document.documentElement.classList.add('dark')
+    localStorage.setItem('dark-mode', 'enabled')
+  }
+
+  const disableDarkMode = () => {
+    document.documentElement.classList.remove('dark')
+    localStorage.setItem('dark-mode', 'disabled')
+  }
 </script>
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger asChild let:builder>
-    <Button builders={[builder]} variant="default">Open</Button>
+    <!-- <Button builders={[builder]} variant="default">Open</Button> -->
+    <Button
+      variant="ghost"
+      builders={[builder]}
+      class="relative w-10 h-10 rounded-full"
+    >
+      <Avatar.Root class="w-10 h-10">
+        <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
+        <Avatar.Fallback>SC</Avatar.Fallback>
+      </Avatar.Root>
+    </Button>
   </DropdownMenu.Trigger>
   <DropdownMenu.Content class="w-56">
     <DropdownMenu.Label>My Account</DropdownMenu.Label>
@@ -55,21 +97,19 @@
       <DropdownMenu.Sub>
         <DropdownMenu.SubTrigger>
           <UserPlus class="w-4 h-4 mr-2" />
-          <span>Invite users</span>
+          <span>Theme</span>
         </DropdownMenu.SubTrigger>
         <DropdownMenu.SubContent>
-          <DropdownMenu.Item>
-            <Mail class="w-4 h-4 mr-2" />
-            <span>Email</span>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item>
-            <MessageSquare class="w-4 h-4 mr-2" />
-            <span>Message</span>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item>
-            <PlusCircle class="w-4 h-4 mr-2" />
-            <span>More...</span>
-          </DropdownMenu.Item>
+          <DropdownMenu.RadioGroup bind:value={darkModePosition}>
+            <DropdownMenu.RadioItem value="system"
+              >System</DropdownMenu.RadioItem
+            >
+            <DropdownMenu.RadioItem value="enabled">Dark</DropdownMenu.RadioItem
+            >
+            <DropdownMenu.RadioItem value="disabled"
+              >Light</DropdownMenu.RadioItem
+            >
+          </DropdownMenu.RadioGroup>
         </DropdownMenu.SubContent>
       </DropdownMenu.Sub>
       <DropdownMenu.Item>
@@ -91,12 +131,22 @@
       <span>API</span>
     </DropdownMenu.Item>
     <DropdownMenu.Separator />
-    <DropdownMenu.Item>
-      <LogOut class="w-4 h-4 mr-2" />
-
-      <form action="?/logout" method="post" use:enhance>
-        <button type="submit"> Logout </button>
-      </form>
-    </DropdownMenu.Item>
+    <form
+      id="formLogout"
+      action="?/logout"
+      method="post"
+      use:enhance
+      bind:this={formLogout}
+    >
+      <DropdownMenu.Item
+        class={'cursor-pointer'}
+        on:click={() => {
+          formLogout.submit()
+        }}
+      >
+        <LogOut class="w-4 h-4 mr-2" />
+        <span>Logout</span>
+      </DropdownMenu.Item>
+    </form>
   </DropdownMenu.Content>
 </DropdownMenu.Root>

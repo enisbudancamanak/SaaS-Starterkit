@@ -1,26 +1,7 @@
 <script lang="ts">
   import { Checkbox as CheckboxPrimitive } from 'bits-ui'
-  import { Check, Minus } from 'lucide-svelte'
   import { cn } from '$lib/utils'
-  import { Motion } from 'svelte-motion'
-
-  const tickVariants = {
-    checked: {
-      pathLength: 1,
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-        delay: 0.1,
-      },
-    },
-    unchecked: {
-      pathLength: 0,
-      opacity: 0,
-      transition: {
-        duration: 0.2,
-      },
-    },
-  }
+  import { draw } from 'svelte/transition'
 
   type $$Props = CheckboxPrimitive.Props
   type $$Events = CheckboxPrimitive.Events
@@ -43,28 +24,23 @@
     class={cn('flex items-center justify-center text-current h-4 w-4 pr-0.5')}
     let:isChecked
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="4"
-      stroke="currentColor"
-      class="w-3 h-3"
-    >
-      <Motion
-        isSVG={true}
-        variants={tickVariants}
-        initial={false}
-        animate={isChecked ? 'checked' : 'unchecked'}
-        let:motion
+    {#if isChecked}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="4"
+        stroke="currentColor"
+        class="w-3 h-3"
       >
         <path
-          use:motion
+          in:draw={{ duration: 300, delay: 200 }}
+          out:draw={{ duration: 200 }}
           stroke-linecap="round"
           stroke-linejoin="round"
           d="M4.5 12.75l6 6 9-13.5"
         />
-      </Motion>
-    </svg>
+      </svg>
+    {/if}
   </CheckboxPrimitive.Indicator>
 </CheckboxPrimitive.Root>

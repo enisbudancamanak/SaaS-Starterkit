@@ -40,17 +40,31 @@
     let:config
     let:submitting
   >
-    <Form.Field {config} name="email">
-      <Form.Item>
-        <Form.Label>E-Mail</Form.Label>
-        <Form.Input
-          type="email"
-          placeholder="Enter your e-mail address"
-          disabled={submitting}
-        />
-        <Form.Validation />
-      </Form.Item>
-    </Form.Field>
+    <div class="flex flex-1 gap-4">
+      <Form.Field {config} name="name">
+        <Form.Item class="flex-1">
+          <Form.Label>Name</Form.Label>
+          <Form.Input
+            type="text"
+            placeholder="Enter your name"
+            disabled={submitting}
+          />
+          <Form.Validation />
+        </Form.Item>
+      </Form.Field>
+
+      <Form.Field {config} name="email">
+        <Form.Item class="flex-1">
+          <Form.Label>E-Mail</Form.Label>
+          <Form.Input
+            type="email"
+            placeholder="Enter your e-mail address"
+            disabled={submitting}
+          />
+          <Form.Validation />
+        </Form.Item>
+      </Form.Field>
+    </div>
 
     <Form.Field {config} name="password">
       <Form.Item>

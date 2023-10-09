@@ -64,6 +64,8 @@ export const GET: PageServerLoad = async (event) => {
         attributes: {
           email: primaryEmail.email.toLowerCase(),
           email_verified: true,
+          name: githubUser.login,
+          profile_picture: githubUser.avatar_url,
         },
       })
     }
@@ -72,6 +74,9 @@ export const GET: PageServerLoad = async (event) => {
 
     await auth.updateUserAttributes(user.userId, {
       email_verified: true,
+      profile_picture: user.profilePicture
+        ? user.profilePicture
+        : githubUser.avatar_url,
     })
 
     const session = await auth.createSession({
@@ -90,6 +95,8 @@ export const GET: PageServerLoad = async (event) => {
       },
     })
   } catch (e) {
+    console.log(e)
+
     if (e instanceof OAuthRequestError) {
       // invalid code
       return new Response(null, {

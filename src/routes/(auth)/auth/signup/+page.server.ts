@@ -42,6 +42,7 @@ export const actions: Actions = {
           password: form.data.password,
         },
         attributes: {
+          name: form.data.name,
           email: form.data.email.toLowerCase(),
           email_verified: false,
         },

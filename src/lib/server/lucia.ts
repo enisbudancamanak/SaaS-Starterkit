@@ -20,8 +20,10 @@ export const auth = lucia({
 
   getUserAttributes: (data) => {
     return {
+      name: data.name,
       email: data.email,
       emailVerified: Boolean(data.email_verified),
+      profilePicture: data.profile_picture,
     }
   },
 })

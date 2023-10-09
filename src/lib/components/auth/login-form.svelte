@@ -20,20 +20,19 @@
 </script>
 
 <div class={cn('grid gap-4', className)} {...$$restProps}>
-  {#if !emailContinue}
-    <!-- Social Login -->
-    <SocialLogins />
-
-    <!-- or -->
-    <div class="relative">
-      <div class="absolute inset-0 flex items-center">
-        <span class="w-full border-t" />
-      </div>
-      <!-- <div class="relative flex justify-center text-xs uppercase">
-        <span class="px-2 bg-background text-muted-foreground"> or </span>
-      </div> -->
+  <!-- Social Login -->
+  <SocialLogins />
+  <!-- or -->
+  <div class="relative">
+    <div class="absolute inset-0 flex items-center">
+      <span class="w-full border-t" />
     </div>
+    <!-- <div class="relative flex justify-center text-xs uppercase">
+      <span class="px-2 bg-background text-muted-foreground"> or </span>
+    </div> -->
+  </div>
 
+  {#if !emailContinue}
     <!-- Email continue button? -->
     <Button
       class="flex-1"

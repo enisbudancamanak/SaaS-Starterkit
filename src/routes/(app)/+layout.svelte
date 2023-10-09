@@ -1,18 +1,22 @@
 <script lang="ts">
   import Nav from '$lib/components/nav.svelte'
   import ProfileMenu from '$lib/components/profileMenu.svelte'
-  import ThemeSwitch from '$lib/components/themeSwitch.svelte'
+  // import ThemeSwitch from '$lib/components/themeSwitch.svelte'
   import type { PageData } from '../$types'
 
   export let data: PageData
 </script>
 
-<Nav />
-<div class="absolute top-4 right-4">
-  <div class="flex items-center justify-center space-x-2">
-    <ProfileMenu />
-    <!-- <ThemeSwitch /> -->
+<nav class="relative flex items-center w-full px-12 pb-4 top-4">
+  <!-- Left Navigation -->
+  <div class="flex justify-center flex-1 mr-auto" />
+  <!-- Logo -->
+  <Nav />
+  <!-- Right Navigation -->
+  <div class="flex justify-end flex-1 ml-auto">
+    <ProfileMenu user={data.user} />
   </div>
-</div>
+</nav>
 
 <slot />
+<!-- </div> -->

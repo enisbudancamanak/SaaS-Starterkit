@@ -1,4 +1,6 @@
+import { auth } from '$lib/server/lucia'
 import { OAuthRequestError } from '@lucia-auth/oauth'
+import { fail } from '@sveltejs/kit'
 
 export async function handleRequest<T>(request: Request) {
   request.headers.set('User-Agent', 'lucia')

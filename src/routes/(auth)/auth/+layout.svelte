@@ -1,14 +1,14 @@
 <script lang="ts">
   import Background from '$lib/components/background.svelte'
-  import Card from '$lib/components/card.svelte'
+  import CardGlance from '$lib/components/cardGlance.svelte'
 </script>
 
 <Background />
 
 <div class="container flex items-center justify-center w-screen h-screen">
-  <Card glanceEffect={true} class="p-8">
+  <CardGlance class="p-8" glanceEffect={true}>
     <slot />
-  </Card>
+  </CardGlance>
 </div>
 
 <style>

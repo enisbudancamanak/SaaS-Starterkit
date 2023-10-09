@@ -59,11 +59,20 @@ export const GET: PageServerLoad = async (event) => {
         attributes: {
           email: googleUser.email?.toLowerCase() as string,
           email_verified: true,
+          name: googleUser.name,
+          profile_picture: googleUser.picture,
         },
       })
     }
 
     const user = await getUser()
+
+    await auth.updateUserAttributes(user.userId, {
+      email_verified: true,
+      profile_picture: user.profilePicture
+        ? user.profilePicture
+        : googleUser.picture,
+    })
 
     const session = await auth.createSession({
       userId: user.userId,

@@ -6,69 +6,51 @@
     Keyboard,
     LifeBuoy,
     LogOut,
-    Mail,
-    MessageSquare,
     Plus,
-    PlusCircle,
     Settings,
     User,
-    UserPlus,
     Users,
+    Paintbrush,
+    Paintbrush2,
   } from 'lucide-svelte'
 
-  import { Button } from '$lib/components/ui/button'
+  import * as Select from '$lib/components/ui/select'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
   import * as Avatar from '$lib/components/ui/avatar'
+  import { Button } from '$lib/components/ui/button'
+  import CardGlance from './cardGlance.svelte'
 
   import { enhance } from '$app/forms'
 
-  let formLogout: HTMLFormElement
+  import { currentTheme } from '$lib/stores'
+  import {
+    enableDarkMode,
+    enableLightMode,
+    enableSystemMode,
+  } from '$lib/themeSwitchHandler'
 
-  // dark mode toggle
-  let darkModePosition: string = localStorage.getItem('dark-mode')
-    ? (localStorage.getItem('dark-mode') as string)
-    : 'system'
-
-  $: if (darkModePosition) {
-    if (darkModePosition === 'system') {
-      localStorage.removeItem('dark-mode')
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? document.documentElement.classList.add('dark')
-        : document.documentElement.classList.remove('dark')
-    } else if (darkModePosition === 'enabled') {
-      enableDarkMode()
-    } else if (darkModePosition === 'disabled') {
-      disableDarkMode()
-    }
-  }
-
-  const enableDarkMode = () => {
-    document.documentElement.classList.add('dark')
-    localStorage.setItem('dark-mode', 'enabled')
-  }
-
-  const disableDarkMode = () => {
-    document.documentElement.classList.remove('dark')
-    localStorage.setItem('dark-mode', 'disabled')
-  }
+  export let user: any
 </script>
 
-<DropdownMenu.Root>
+<DropdownMenu.Root loop={true}>
   <DropdownMenu.Trigger asChild let:builder>
-    <!-- <Button builders={[builder]} variant="default">Open</Button> -->
-    <Button
-      variant="ghost"
-      builders={[builder]}
-      class="relative w-10 h-10 rounded-full"
-    >
-      <Avatar.Root class="w-10 h-10">
-        <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
-        <Avatar.Fallback>SC</Avatar.Fallback>
-      </Avatar.Root>
+    <Button variant="ghost" builders={[builder]} class="!p-0 rounded-lg">
+      <CardGlance class="flex items-center gap-4 px-2 py-1 rounded-lg">
+        <div class="flex flex-col gap-0 ml-2 text-left">
+          <span>{user.name}</span>
+          <span class="text-xs text-muted-foreground">Super Admin</span>
+        </div>
+        <Avatar.Root class="w-8 h-8 rounded-sm">
+          <Avatar.Image src={user.profilePicture} alt={'profilePicture'} />
+          <Avatar.Fallback class="uppercase"
+            >{user.name.slice(0, 2)}</Avatar.Fallback
+          >
+        </Avatar.Root>
+      </CardGlance>
     </Button>
   </DropdownMenu.Trigger>
   <DropdownMenu.Content class="w-56">
-    <DropdownMenu.Label>My Account</DropdownMenu.Label>
+    <DropdownMenu.Label>{user.name}</DropdownMenu.Label>
     <DropdownMenu.Separator />
     <DropdownMenu.Group>
       <DropdownMenu.Item>
@@ -89,64 +71,59 @@
       </DropdownMenu.Item>
     </DropdownMenu.Group>
     <DropdownMenu.Separator />
-    <DropdownMenu.Group>
-      <DropdownMenu.Item>
-        <Users class="w-4 h-4 mr-2" />
-        <span>Team</span>
-      </DropdownMenu.Item>
-      <DropdownMenu.Sub>
-        <DropdownMenu.SubTrigger>
-          <UserPlus class="w-4 h-4 mr-2" />
-          <span>Theme</span>
-        </DropdownMenu.SubTrigger>
-        <DropdownMenu.SubContent>
-          <DropdownMenu.RadioGroup bind:value={darkModePosition}>
-            <DropdownMenu.RadioItem value="system"
-              >System</DropdownMenu.RadioItem
-            >
-            <DropdownMenu.RadioItem value="enabled">Dark</DropdownMenu.RadioItem
-            >
-            <DropdownMenu.RadioItem value="disabled"
-              >Light</DropdownMenu.RadioItem
-            >
-          </DropdownMenu.RadioGroup>
-        </DropdownMenu.SubContent>
-      </DropdownMenu.Sub>
-      <DropdownMenu.Item>
-        <Plus class="w-4 h-4 mr-2" />
-        <span>New Team</span>
-      </DropdownMenu.Item>
-    </DropdownMenu.Group>
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item>
-      <Github class="w-4 h-4 mr-2" />
-      <span>GitHub</span>
+    <DropdownMenu.Item class="flex justify-between gap-5">
+      <div class="flex items-center">
+        <Paintbrush2 class="w-4 h-4 mr-2" />
+        <span>Theme</span>
+      </div>
+      <Select.Root selected={{ value: $currentTheme }}>
+        <Select.Trigger class="w-full h-6 rounded-lg">
+          <Select.Value
+            placeholder={$currentTheme === 'system'
+              ? 'System'
+              : $currentTheme === 'enabled'
+              ? 'Dark'
+              : 'Light'}
+          />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="disabled" on:click={enableLightMode}
+            >Light</Select.Item
+          >
+          <Select.Item value="enabled" on:click={enableDarkMode}
+            >Dark</Select.Item
+          >
+          <Select.Item value="system" on:click={enableSystemMode}
+            >System</Select.Item
+          >
+        </Select.Content>
+      </Select.Root>
     </DropdownMenu.Item>
+    <DropdownMenu.Separator />
     <DropdownMenu.Item>
       <LifeBuoy class="w-4 h-4 mr-2" />
       <span>Support</span>
     </DropdownMenu.Item>
-    <DropdownMenu.Item>
-      <Cloud class="w-4 h-4 mr-2" />
-      <span>API</span>
-    </DropdownMenu.Item>
     <DropdownMenu.Separator />
-    <form
-      id="formLogout"
-      action="?/logout"
-      method="post"
-      use:enhance
-      bind:this={formLogout}
+
+    <DropdownMenu.Item
+      class="cursor-pointer text-destructive !p-0 !py-2 !px-2.5"
     >
-      <DropdownMenu.Item
-        class={'cursor-pointer'}
-        on:click={() => {
-          formLogout.submit()
-        }}
+      <form
+        action="?/logout"
+        method="post"
+        use:enhance
+        class="flex items-center"
       >
-        <LogOut class="w-4 h-4 mr-2" />
-        <span>Logout</span>
-      </DropdownMenu.Item>
-    </form>
+        <Button
+          type="submit"
+          variant="none"
+          class="!py-1/.5 !h-0 !px-0 hover:!text-destructive-foreground"
+        >
+          <LogOut class="w-4 h-4 mr-2" />
+          <span>Logout</span>
+        </Button>
+      </form>
+    </DropdownMenu.Item>
   </DropdownMenu.Content>
 </DropdownMenu.Root>

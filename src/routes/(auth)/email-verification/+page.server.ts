@@ -54,6 +54,9 @@ export const actions: Actions = {
 
     // send verification code
     const code = await generateVerificationToken(user.userId)
+
+    // console.log(code)
+
     const token = await generateEmailVerificationToken(user.userId)
 
     await sendVerificationEmail(code, token)

@@ -5,12 +5,16 @@
   // icons
   import SunIcon from '~icons/mdi/white-balance-sunny'
   import MoonIcon from '~icons/mdi/moon-waning-crescent'
+  import { onMount } from 'svelte'
 
-  let darkMode = localStorage.getItem('dark-mode')
-    ? localStorage.getItem('dark-mode')
-    : window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'enabled'
-    : 'disabled'
+  let darkMode: string
+  onMount(() => {
+    darkMode = localStorage.getItem('dark-mode')
+      ? (localStorage.getItem('dark-mode') as string)
+      : window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'enabled'
+      : 'disabled'
+  })
 
   const enableDarkMode = () => {
     document.documentElement.classList.add('dark')
@@ -53,7 +57,7 @@
 
 <Button
   on:click={handleSwitchDarkMode}
-  class="flex items-center justify-center w-full"
+  class="flex items-center justify-center w-8 h-8"
 >
   {#if darkMode === 'enabled'}
     <SunIcon class="absolute w-5 h-5" />

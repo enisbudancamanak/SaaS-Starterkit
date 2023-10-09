@@ -1,15 +1,18 @@
-<script>
+<script lang="ts">
   import '../fonts.css'
   import '../app.postcss'
 
-  // import { Toaster, toast } from 'svelte-sonner'
-
+  // import CookieConsent from '$lib/components/cookieConsent.svelte'
   import toast, { Toaster } from 'svelte-french-toast'
   import { beforeNavigate, onNavigate } from '$app/navigation'
   import { page } from '$app/stores'
   import { initFlash } from 'sveltekit-flash-message/client'
-  import ThemeSwitch from '$lib/components/themeSwitch.svelte'
-  import CookieConsent from '$lib/components/cookieConsent.svelte'
+  import { initThemeValue, getThemeValue } from '$lib/themeSwitchHandler'
+  import { onMount } from 'svelte'
+
+  onMount(() => {
+    getThemeValue()
+  })
 
   // https://svelte.dev/blog/view-transitions
   onNavigate((navigation) => {
@@ -54,11 +57,13 @@
   }
 </script>
 
+<!-- init themeChange -->
+<svelte:head>
+  {@html `<\u{73}cript nonce="%sveltekit.nonce%">(${initThemeValue.toString()})();</script>`}
+</svelte:head>
+
 <!-- <CookieConsent /> -->
 <Toaster position="bottom-right" />
-<!-- <div class="absolute top-4 right-4">
-  <ThemeSwitch />
-</div> -->
 <slot />
 
 <style>

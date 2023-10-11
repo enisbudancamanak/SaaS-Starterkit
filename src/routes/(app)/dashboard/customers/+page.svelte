@@ -17,29 +17,29 @@
   //   import { ArrowUpDown, ChevronDown } from 'lucide-svelte'
   import Separator from '$lib/components/ui/separator/separator.svelte'
   import type { PageData } from './$types'
-  import dayjs from 'dayjs'
 
   export let data: PageData
+  console.log(data.customers)
 
-  type Order = {
+  type Customer = {
     id: string
-    status: 'Paid' | 'Pending' | 'Unpaid'
-    totalAmount: string
+    status: 'Subscribed' | 'Unsubscribed'
+    country: string
     email: string
-    time: string
+    name: string
   }
 
-  const orders: Order[] = [
-    ...data.orders.data.map((order) => ({
-      id: order.id,
-      status: order.attributes.status_formatted as Order['status'],
-      totalAmount: order.attributes.total_formatted,
-      email: order.attributes.user_email,
-      time: order.attributes.created_at,
+  const customers: Customer[] = [
+    ...data.customers.data.map((customer) => ({
+      id: customer.id,
+      status: customer.attributes.status_formatted as Customer['status'],
+      country: customer.attributes.country_formatted,
+      email: customer.attributes.email,
+      name: customer.attributes.name,
     })),
   ]
 
-  const table = createTable(readable(orders), {
+  const table = createTable(readable(customers), {
     sort: addSortBy({ disableMultiSort: true }),
     page: addPagination({ initialPageSize: 10 }),
     filter: addTableFilter({
@@ -50,19 +50,8 @@
 
   const columns = table.createColumns([
     table.column({
-      header: 'Order ID',
+      header: 'Customer ID',
       accessor: 'id',
-      plugins: { sort: { disable: true }, filter: { exclude: true } },
-    }),
-    table.column({
-      header: 'Time',
-      accessor: 'time',
-      plugins: { sort: { disable: true }, filter: { exclude: true } },
-      cell: ({ value }) => dayjs(value).format('DD MMM, hh:mm A'),
-    }),
-    table.column({
-      header: 'Status',
-      accessor: 'status',
       plugins: { sort: { disable: true }, filter: { exclude: true } },
     }),
     table.column({
@@ -77,16 +66,18 @@
       },
     }),
     table.column({
-      header: 'Amount',
-      accessor: 'totalAmount',
-      plugins: {
-        sort: {
-          disable: true,
-        },
-        filter: {
-          exclude: true,
-        },
-      },
+      header: 'Name',
+      accessor: 'name',
+      plugins: { sort: { disable: true }, filter: { exclude: true } },
+    }),
+    table.column({
+      header: 'Status',
+      accessor: 'status',
+      plugins: { sort: { disable: true }, filter: { exclude: true } },
+    }),
+    table.column({
+      header: 'Country',
+      accessor: 'country',
     }),
   ])
 
@@ -104,7 +95,7 @@
   <p class="text-sm text-muted-foreground">
     <Time timestamp={new Date()} format="ddd D MMM, hh:mm A" />
   </p>
-  <h2>Orders</h2>
+  <h2>Customers</h2>
 </div>
 <Separator class="my-6" />
 
@@ -135,11 +126,11 @@
                       <Button variant="ghost" on:click={props.sort.toggle}>
                         <Render of={cell.render()} />
                         <!-- <ArrowUpDown
-                          class={cn(
-                            $sortKeys[0]?.id === cell.id && 'text-foreground',
-                            'ml-2 h-4 w-4'
-                          )}
-                        /> -->
+                            class={cn(
+                              $sortKeys[0]?.id === cell.id && 'text-foreground',
+                              'ml-2 h-4 w-4'
+                            )}
+                          /> -->
                       </Button>
                     {:else}
                       <Render of={cell.render()} />
@@ -179,7 +170,7 @@
   </div>
   <div class="flex items-center justify-end py-4 space-x-2">
     <div class="flex-1 text-sm text-muted-foreground">
-      Total amount of orders: {orders.length}
+      Total amount of customers: {customers.length}
       <br />
       Page {$pageIndex + 1} of {$pageCount}
     </div>

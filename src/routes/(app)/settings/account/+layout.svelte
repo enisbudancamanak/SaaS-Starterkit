@@ -1,6 +1,6 @@
 <script lang="ts">
   // Icons
-  import OverviewIcon from '~icons/ph/squares-four-bold'
+  import PersonIcon from '~icons/material-symbols/person'
   import DeliveryIcon from '~icons/material-symbols/package-2'
   import ChartIcon from '~icons/material-symbols/chart-data-rounded'
   import CustomerIcon from '~icons/material-symbols/shopping-cart'
@@ -11,27 +11,42 @@
   // Items Sidebar
   const sidebarNavItems = [
     {
-      title: null,
+      title: 'Profile',
       items: [
         {
-          icon: OverviewIcon,
-          title: 'Overview',
+          icon: PersonIcon,
+          title: 'Edit Profile',
+          href: '/settings/account',
+        },
+      ],
+    },
+    {
+      title: 'Bank',
+      items: [
+        {
+          icon: PersonIcon,
+          title: 'Invoices',
           href: '/dashboard',
         },
         {
           icon: DeliveryIcon,
-          title: 'Orders',
+          title: 'Billing',
           href: '/dashboard/orders',
         },
+      ],
+    },
+    {
+      title: 'Secure',
+      items: [
         {
-          icon: CustomerIcon,
-          title: 'Customers',
-          href: '/dashboard/customers',
+          icon: PersonIcon,
+          title: 'Password',
+          href: '/dashboard',
         },
         {
-          icon: ChartIcon,
-          title: 'Analytics',
-          href: '/dashboard/analytics',
+          icon: PersonIcon,
+          title: 'Login Connections',
+          href: '/dashboard',
         },
       ],
     },

@@ -32,10 +32,13 @@
   export let user: any
 </script>
 
-<DropdownMenu.Root loop={true}>
+<DropdownMenu.Root preventScroll={false} loop={true}>
   <DropdownMenu.Trigger asChild let:builder>
     <Button variant="ghost" builders={[builder]} class="!p-0 rounded-lg">
-      <CardGlance class="flex items-center gap-4 px-2 py-1 rounded-lg">
+      <CardGlance
+        glanceEffect={false}
+        class="flex items-center gap-4 px-2 py-1 rounded-lg"
+      >
         <div class="flex flex-col gap-0 ml-2 text-left">
           <span>{user.name}</span>
           <span class="text-xs text-muted-foreground">Super Admin</span>
@@ -76,7 +79,7 @@
         <Paintbrush2 class="w-4 h-4 mr-2" />
         <span>Theme</span>
       </div>
-      <Select.Root selected={{ value: $currentTheme }}>
+      <Select.Root preventScroll={false} selected={{ value: $currentTheme }}>
         <Select.Trigger class="w-full h-6 rounded-lg">
           <Select.Value
             placeholder={$currentTheme === 'system'

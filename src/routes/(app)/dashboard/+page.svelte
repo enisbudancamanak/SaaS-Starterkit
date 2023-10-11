@@ -1,47 +1,57 @@
 <script lang="ts">
-  import ChartCard from '$lib/components/dashboard/chartCard.svelte'
-  import { Separator } from '$lib/components/ui/separator'
   import Time from 'svelte-time'
-  import * as Table from '$lib/components/ui/table'
-  import Bar from '$lib/components/bar.svelte'
 
-  const invoices = [
-    {
-      invoice: 'INV001',
-      paymentStatus: 'Paid',
-      totalAmount: '$250.00',
-      paymentMethod: 'Credit Card',
-    },
-    {
-      invoice: 'INV002',
-      paymentStatus: 'Pending',
-      totalAmount: '$150.00',
-      paymentMethod: 'PayPal',
-    },
-    {
-      invoice: 'INV003',
-      paymentStatus: 'Unpaid',
-      totalAmount: '$350.00',
-      paymentMethod: 'Bank Transfer',
-    },
-    {
-      invoice: 'INV004',
-      paymentStatus: 'Paid',
-      totalAmount: '$450.00',
-      paymentMethod: 'Credit Card',
-    },
-    {
-      invoice: 'INV005',
-      paymentStatus: 'Paid',
-      totalAmount: '$550.00',
-      paymentMethod: 'PayPal',
-    },
-  ]
+  // Components
+  import { Separator } from '$lib/components/ui/separator'
+  import ChartCard from '$lib/components/dashboard/chartCard.svelte'
+  import Bar from '$lib/components/dashboard/barChart.svelte'
+  import SimpleTable from '$lib/components/dashboard/simpleTable.svelte'
 
+  // Types
   import type { PageData } from './$types'
 
   export let data: PageData
-  console.log(data.orders)
+
+  // SORT SALE BY MONTH = GET LAST 12 MONTHS
+  // const months = [
+  //   'Jan',
+  //   'Feb',
+  //   'Mar',
+  //   'Apr',
+  //   'May',
+  //   'Jun',
+  //   'Jul',
+  //   'Aug',
+  //   'Sep',
+  //   'Oct',
+  //   'Nov',
+  //   'Dec',
+  // ]
+
+  // const currentMonth = dayjs().month() + 1
+  // const last12Months = months.slice(currentMonth - 12, currentMonth)
+
+  // const data = last12Months.map((month) => {
+  //   return {
+  //     name: month,
+
+  //     total: Math.floor(Math.random() * 5000) + 1000,
+  //   }
+
+  //   // return {
+  //   //   name: month,
+  //   //   total: orders.data
+  //   //     .filter((order: any) => {
+  //   //       const orderMonth = dayjs(order.attributes.created_at).month() + 1
+  //   //       return orderMonth === month
+  //   //     })
+  //   //     .reduce((acc: number, order: any) => {
+  //   //       return acc + order.attributes.total
+  //   //     }, 0),
+  //   // }
+  // })
+
+  // console.log(data)
 </script>
 
 <div class="space-y-0.5">
@@ -53,64 +63,43 @@
 <Separator class="my-6" />
 
 <div class="flex flex-col gap-4">
-  <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+  <div class="grid gap-4 md:grid-cols-3">
     <ChartCard
       title="Total revenue"
-      value={105865.89}
+      value={data.store.data[0].attributes.total_revenue + 1}
       moneyPrefix={true}
-      percentage={34}
     />
     <ChartCard
       title="Subscriptions"
-      value={221}
+      value={data.subscriptions.data.length}
       decimalPlaces={0}
       moneyPrefix={false}
-      percentage={10}
     />
-    <ChartCard
+    <!-- <ChartCard
       title="Sales"
       value={7865.43}
       moneyPrefix={true}
       percentage={10}
-    />
+    /> -->
     <ChartCard
       title="Store visitors"
       value={2245}
       moneyPrefix={false}
       decimalPlaces={0}
-      percentage={73}
     />
   </div>
 
   <div class="flex flex-wrap gap-4">
     <div class="w-full md:flex-1">
-      <ChartCard title="Sales activity">
-        <Bar />
-      </ChartCard>
+      <Bar />
     </div>
 
     <div class="w-full md:w-fit">
-      <ChartCard title="Recent orders">
-        <Table.Root>
-          <Table.Caption>A list of your recent invoices.</Table.Caption>
-          <Table.Header>
-            <Table.Row>
-              <Table.Head>Invoice</Table.Head>
-              <Table.Head>Method</Table.Head>
-              <Table.Head class="text-right">Amount</Table.Head>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {#each invoices as invoice, i (i)}
-              <Table.Row>
-                <Table.Cell class="font-medium">{invoice.invoice}</Table.Cell>
-                <Table.Cell>{invoice.paymentMethod}</Table.Cell>
-                <Table.Cell class="text-right">{invoice.totalAmount}</Table.Cell
-                >
-              </Table.Row>
-            {/each}
-          </Table.Body>
-        </Table.Root>
+      <ChartCard
+        title="Recent orders"
+        link={{ goto: '/dashboard/orders', name: 'View all' }}
+      >
+        <SimpleTable ordersData={data.orders} />
       </ChartCard>
     </div>
   </div>

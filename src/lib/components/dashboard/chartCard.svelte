@@ -1,6 +1,8 @@
 <script lang="ts">
   import Card from '../card.svelte'
   import ChartIcon from '~icons/material-symbols/chart-data-rounded'
+  import * as Select from '$lib/components/ui/select'
+  import { Button } from '$lib/components/ui/button'
 
   import { tweened } from 'svelte/motion'
   import { quintOut } from 'svelte/easing'
@@ -11,6 +13,15 @@
   export let percentage: number = 0
   export let moneyPrefix: boolean = false
   export let decimalPlaces: number = 2
+  export let link: linkObject = null
+
+  type linkObject = {
+    name: string
+    goto: string
+  } | null
+
+  export let stringTimeSpans: string[] = []
+  export let selectedTimeSpan: string = ''
 
   //   Counter animation
   export let valueTweened = tweened(0, {
@@ -26,12 +37,42 @@
 </script>
 
 <Card
-  class="!w-full p-4 bg-accent shadow-inner hover:shadow-accent/40 hover:bg-accent/40 transition-all duration-200"
+  class="!w-full !h-full p-4 bg-accent shadow-inner hover:shadow-accent/40 hover:bg-accent/40 transition-all duration-200"
 >
   <div class="flex flex-col gap-2">
-    <span class="text-sm text-muted-foreground">{title}</span>
+    {#if link}
+      <div class="flex items-center justify-between pb-3">
+        <span class="text-sm text-muted-foreground">{title}</span>
+        <Button variant="outline" size="sm" href={link.goto}>{link.name}</Button
+        >
+      </div>
+    {:else}
+      <span class="text-sm text-muted-foreground">{title}</span>
+    {/if}
 
-    {#if value}
+    {#if stringTimeSpans.length > 0 && value}
+      <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-4">
+          <span class="text-xl text-foreground"
+            >{moneyPrefix ? '$' : ''}{$formattedValue}</span
+          >
+        </div>
+
+        <Select.Root
+          preventScroll={false}
+          selected={{ value: selectedTimeSpan }}
+        >
+          <Select.Trigger class="rounded-lg h-7">
+            <Select.Value placeholder={'Last 30 Days'} />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="disabled">Light</Select.Item>
+            <Select.Item value="enabled">Dark</Select.Item>
+            <Select.Item value="system">System</Select.Item>
+          </Select.Content>
+        </Select.Root>
+      </div>
+    {:else if value}
       <div class="flex items-center justify-between gap-4">
         <span class="text-xl text-foreground"
           >{moneyPrefix ? '$' : ''}{$formattedValue}</span

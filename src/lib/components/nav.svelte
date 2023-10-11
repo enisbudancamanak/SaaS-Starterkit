@@ -16,11 +16,11 @@
     },
     {
       title: 'Billing',
-      href: '/account/billing',
+      href: '/settings/account/billing',
     },
     {
       title: 'Pricindawdwadawdg',
-      href: '/account',
+      href: '/settings/account',
     },
     {
       title: 'Dashboard',

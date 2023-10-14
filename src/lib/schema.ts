@@ -9,6 +9,11 @@ export const newUserSchema = z.object({
     .max(32, 'Password should be no longer than 32 characters'),
 })
 
+export const updateProfileDetailsSchema = z.object({
+  name: z.string().min(3, 'Please type your name'),
+  email: z.string().email({ message: 'E-Mail must be a valid email address' }),
+})
+
 export const loginSchema = z.object({
   email: z.string().email({ message: 'E-Mail must be a valid email address' }),
   password: z.string().min(2, 'Please type your password'),
@@ -39,3 +44,4 @@ export const resetPasswordSchema = z
 export type FormSchema = typeof newUserSchema
 export type EnterEmailSchema = typeof enterEmailSchema
 export type ResetPasswordSchema = typeof resetPasswordSchema
+export type UpdateProfileDetailsSchema = typeof updateProfileDetailsSchema

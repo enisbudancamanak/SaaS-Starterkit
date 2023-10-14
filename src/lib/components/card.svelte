@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
   import { cn } from '$lib/utils'
-  import type { HTMLAttributes } from 'svelte/elements'
 
   let className: $$Props['class'] = undefined
   let styling: $$Props['style'] = undefined

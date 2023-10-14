@@ -1,18 +1,12 @@
 <script lang="ts">
-  import {
-    Cloud,
-    CreditCard,
-    Github,
-    Keyboard,
-    LifeBuoy,
-    LogOut,
-    Plus,
-    Settings,
-    User,
-    Users,
-    Paintbrush,
-    Paintbrush2,
-  } from 'lucide-svelte'
+  import Cloud from '~icons/lucide/cloud'
+  import CreditCard from '~icons/lucide/credit-card'
+  import GitHub from '~icons/lucide/github'
+  import Keyboard from '~icons/lucide/keyboard'
+  import LogOut from '~icons/lucide/log-out'
+  import Paintbrush2 from '~icons/lucide/paintbrush2'
+  import User from '~icons/lucide/user'
+  import Settings from '~icons/lucide/settings'
 
   import * as Select from '$lib/components/ui/select'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
@@ -30,9 +24,18 @@
   } from '$lib/themeSwitchHandler'
 
   export let user: any
+  let open: boolean = false
+
+  // Handle Menu close after choosing a new theme
+  $: if ($currentTheme) closeMenu()
+
+  // Functions
+  const closeMenu = () => {
+    open = false
+  }
 </script>
 
-<DropdownMenu.Root preventScroll={false} loop={true}>
+<DropdownMenu.Root bind:open preventScroll={false} loop={true}>
   <DropdownMenu.Trigger asChild let:builder>
     <Button variant="ghost" builders={[builder]} class="!p-0 rounded-lg">
       <CardGlance
@@ -68,13 +71,14 @@
         <Settings class="w-4 h-4 mr-2" />
         <span>Settings</span>
       </DropdownMenu.Item>
-      <DropdownMenu.Item>
-        <Keyboard class="w-4 h-4 mr-2" />
-        <span>Keyboard shortcuts</span>
-      </DropdownMenu.Item>
     </DropdownMenu.Group>
     <DropdownMenu.Separator />
-    <DropdownMenu.Item class="flex justify-between gap-5">
+    <DropdownMenu.Item
+      on:click={(e) => {
+        e.preventDefault()
+      }}
+      class="flex justify-between gap-5"
+    >
       <div class="flex items-center">
         <Paintbrush2 class="w-4 h-4 mr-2" />
         <span>Theme</span>
@@ -103,15 +107,10 @@
       </Select.Root>
     </DropdownMenu.Item>
     <DropdownMenu.Separator />
-    <DropdownMenu.Item>
-      <LifeBuoy class="w-4 h-4 mr-2" />
-      <span>Support</span>
-    </DropdownMenu.Item>
-    <DropdownMenu.Separator />
-
     <DropdownMenu.Item
       class="cursor-pointer text-destructive !p-0 !py-2 !px-2.5"
     >
+      <LogOut class="w-4 h-4 mr-2" />
       <form
         action="?/logout"
         method="post"
@@ -123,7 +122,6 @@
           variant="none"
           class="!py-1/.5 !h-0 !px-0 hover:!text-destructive-foreground"
         >
-          <LogOut class="w-4 h-4 mr-2" />
           <span>Logout</span>
         </Button>
       </form>

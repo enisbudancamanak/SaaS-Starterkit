@@ -6,83 +6,22 @@
   import { quintInOut } from 'svelte/easing'
 
   export let orders: any
+  let ordersSliced: any
+  let totalSum: any
 
-  const data = [
-    {
-      name: 'Jan',
-      month: 1,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Feb',
-      month: 2,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Mar',
-      month: 3,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Apr',
-      month: 4,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'May',
-      month: 5,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Jun',
-      month: 6,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Jul',
-      month: 7,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Aug',
-      month: 8,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Sep',
-      month: 9,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Oct',
-      month: 10,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Nov',
-      month: 11,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-    {
-      name: 'Dec',
-      month: 12,
-      total: Math.floor(Math.random() * 5000) + 1000,
-    },
-  ]
+  $: if (orders) {
+    ordersSliced = orders
 
-  const timeSpans = ['Last 7 days', 'Last 30 days', 'Last 90 days']
-  const yTicks = [0, 1500, 3000, 4500, 6000]
+    console.log(orders)
+
+    totalSum = orders.reduce((a: any, b: any) => a + b.total, 0)
+  }
+
+  const yTicks = [0, 50, 100, 150, 200, 250, 300]
   const padding = { top: 20, right: 15, bottom: 20, left: 55 }
-  const currentMonth = dayjs().month() + 1
-
-  let dataSliced = data
 
   let width = 0
   let height = 0
-
-  function formatMobile(tick: number | string) {
-    return "'" + tick.toString().slice(0, 2)
-  }
 
   $: xScale = scaleLinear()
     .domain([0, xTicks.length])
@@ -94,39 +33,25 @@
 
   $: innerWidth = width - (padding.left + padding.right)
   $: barWidth = innerWidth / xTicks.length
-  $: xTicks = dataSliced.map((d) => d.name)
+  $: xTicks = ordersSliced.map((d: any) => d.name)
 
   // Responsive
   $: if (innerWidth > 400) {
-    dataSliced = sortMonths(12)
+    ordersSliced = sortMonths(12)
   } else if (innerWidth < 400 && innerWidth > 350) {
-    dataSliced = sortMonths(10)
+    ordersSliced = sortMonths(10)
   } else if (innerWidth < 350 && innerWidth > 300) {
-    dataSliced = sortMonths(8)
+    ordersSliced = sortMonths(8)
   } else if (innerWidth < 300) {
-    dataSliced = sortMonths(6)
+    ordersSliced = sortMonths(6)
   }
 
-  function sortMonths(count: number) {
-    let dataClone = data
-    dataClone = dataClone.sort(function (m1, m2) {
-      var n1 = m1.month,
-        n2 = m2.month
-      if (n1 > currentMonth) {
-        n1 = n1 - 12
-      }
-      if (n2 > currentMonth) {
-        n2 = n2 - 12
-      }
-      return n1 - n2
-    })
-    dataClone = dataClone.slice(dataClone.length - count, dataClone.length)
-
-    return dataClone
+  function sortMonths(months: number) {
+    return orders.slice(orders.length - months, orders.length)
   }
 </script>
 
-<ChartCard title="Sales activity" value={7865.43} moneyPrefix={true}>
+<ChartCard title="Sales activity" value={totalSum} moneyPrefix={true}>
   <div class="pt-3.5">
     <div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
       {#if width > 0}
@@ -153,7 +78,7 @@
 
           <!-- x axis -->
           <g class="axis x-axis">
-            {#each dataSliced as point, i}
+            {#each ordersSliced as point, i}
               <g class="text-xs" transform="translate({xScale(i)},{height})">
                 <text
                   in:fade={{
@@ -177,7 +102,7 @@
           </g>
 
           <g>
-            {#each dataSliced as point, i}
+            {#each ordersSliced as point, i}
               <rect
                 in:fade={{
                   duration: 200,
@@ -185,9 +110,9 @@
                 }}
                 class="fill-accent-foreground/40"
                 x={xScale(i) + 8}
-                y={yScale(6200)}
+                y={yScale(300)}
                 width={barWidth - 15}
-                height={yScale(0) - yScale(6200)}
+                height={yScale(0) - yScale(300)}
                 rx="12"
                 ry="12"
               />
@@ -195,7 +120,7 @@
           </g>
 
           <g>
-            {#each dataSliced as point, i}
+            {#each ordersSliced as point, i}
               <rect
                 in:fade={{
                   duration: 250,

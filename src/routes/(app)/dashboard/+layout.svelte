@@ -2,11 +2,11 @@
   // Icons
   import OverviewIcon from '~icons/ph/squares-four-bold'
   import DeliveryIcon from '~icons/material-symbols/package-2'
-  import ChartIcon from '~icons/material-symbols/chart-data-rounded'
   import CustomerIcon from '~icons/material-symbols/shopping-cart'
 
   // UI
   import SidebarNav from '$lib/components/sidebar.svelte'
+  import Time from 'svelte-time/src/Time.svelte'
 
   // Items Sidebar
   const sidebarNavItems = [
@@ -28,11 +28,6 @@
           title: 'Customers',
           href: '/dashboard/customers',
         },
-        {
-          icon: ChartIcon,
-          title: 'Analytics',
-          href: '/dashboard/analytics',
-        },
       ],
     },
   ]
@@ -44,6 +39,9 @@
       <SidebarNav navItems={sidebarNavItems} />
     </aside>
     <div class="flex-1">
+      <p class="text-sm text-muted-foreground">
+        <Time timestamp={new Date()} format="ddd D MMM, hh:mm A" />
+      </p>
       <slot />
     </div>
   </div>

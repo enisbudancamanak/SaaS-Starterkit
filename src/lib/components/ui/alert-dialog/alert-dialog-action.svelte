@@ -10,7 +10,7 @@
 </script>
 
 <AlertDialogPrimitive.Action
-  class={cn(buttonVariants({ variant: 'outline' }), className)}
+  class={cn(buttonVariants({ variant: 'default' }), className)}
   {...$$restProps}
 >
   <slot />

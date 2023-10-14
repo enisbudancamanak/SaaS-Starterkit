@@ -6,7 +6,6 @@
     addTableFilter,
     addSelectedRows,
   } from 'svelte-headless-table/plugins'
-  import Time from 'svelte-time'
 
   import { readable } from 'svelte/store'
   import * as Table from '$lib/components/ui/table'
@@ -30,7 +29,7 @@
   }
 
   const orders: Order[] = [
-    ...data.orders.data.map((order) => ({
+    ...data.orders.data.map((order: any) => ({
       id: order.id,
       status: order.attributes.status_formatted as Order['status'],
       totalAmount: order.attributes.total_formatted,
@@ -101,9 +100,6 @@
 </script>
 
 <div class="space-y-0.5">
-  <p class="text-sm text-muted-foreground">
-    <Time timestamp={new Date()} format="ddd D MMM, hh:mm A" />
-  </p>
   <h2>Orders</h2>
 </div>
 <Separator class="my-6" />

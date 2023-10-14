@@ -3,14 +3,6 @@
 
   // Components
   import { Separator } from '$lib/components/ui/separator'
-  import ChartCard from '$lib/components/dashboard/chartCard.svelte'
-  import Bar from '$lib/components/dashboard/barChart.svelte'
-  import SimpleTable from '$lib/components/dashboard/simpleTable.svelte'
-
-  // Types
-  import type { PageData } from './$types'
-
-  export let data: PageData
 </script>
 
 <div class="space-y-0.5">

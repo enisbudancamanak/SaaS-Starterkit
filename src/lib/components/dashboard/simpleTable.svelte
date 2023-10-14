@@ -4,8 +4,6 @@
 
   export let ordersData: any
 
-  console.log(ordersData.data)
-
   type Order = {
     id: string
     status: 'Paid' | 'Pending' | 'Unpaid'

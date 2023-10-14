@@ -54,7 +54,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center justify-between gap-4">
           <span class="text-xl text-foreground"
-            >{moneyPrefix ? '$' : ''}{$formattedValue}</span
+            >{moneyPrefix ? '€' : ''}{$formattedValue}</span
           >
         </div>
 
@@ -75,7 +75,7 @@
     {:else if value}
       <div class="flex items-center justify-between gap-4">
         <span class="text-xl text-foreground"
-          >{moneyPrefix ? '$' : ''}{$formattedValue}</span
+          >{moneyPrefix ? '€' : ''}{$formattedValue}</span
         >
       </div>
     {/if}

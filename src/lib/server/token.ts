@@ -2,11 +2,15 @@ import { generateRandomString, isWithinExpiration } from 'lucia/utils'
 import { prisma } from '$lib/server/prisma'
 import { auth } from '$lib/server/lucia'
 import { render } from 'svelte-email'
+import { sendEmail } from '$lib/emails/send'
+
+// Email Components
 // @ts-ignore
 import VerificationCode from '$lib/emails/components/VerificationCode.svelte'
 // @ts-ignore
 import ResetPassword from '$lib/emails/components/ResetPassword.svelte'
-import { sendEmail } from '$lib/emails/send'
+// @ts-ignore
+import ResetEmail from '$lib/emails/components/ResetEmail.svelte'
 
 const EXPIRES_IN = 1000 * 60 * 5 //5 minutes
 const verificationTimeout = new Map<
@@ -187,7 +191,6 @@ export const generatePasswordResetToken = async (userId: string) => {
       user_id: userId,
     },
   })
-  console.log(token)
 
   return token
 }
@@ -225,16 +228,6 @@ export const validatePasswordResetToken = async (token: string) => {
  */
 
 export const sendPasswordResetEmail = async (token: string | number) => {
-  // const transporter = nodemailer.createTransport({
-  //   host: 'smtp.gmail.com',
-  //   port: 587,
-  //   secure: false,
-  //   auth: {
-  //     user: GMAIL_EMAIL,
-  //     pass: GMAIL_PASSWORD,
-  //   },
-  // })
-
   const emailHtml = render({
     template: ResetPassword,
     props: { token: token },
@@ -246,16 +239,6 @@ export const sendPasswordResetEmail = async (token: string | number) => {
     subject: 'Reset your password',
     html: emailHtml,
   })
-
-  // const options = {
-  //   from: GMAIL_EMAIL,
-  //   to: 'enis.budancamanak@hotmail.com',
-  //   subject: `Reset your password`,
-  //   html: emailHtml,
-
-  // }
-
-  // await transporter.sendMail(options)
 }
 
 /**
@@ -268,34 +251,73 @@ export const sendVerificationEmail = async (
   code: string,
   token: string | number
 ) => {
-  // const transporter = nodemailer.createTransport({
-  //   host: 'smtp.gmail.com',
-  //   port: 587,
-  //   secure: false,
-  //   auth: {
-  //     user: GMAIL_EMAIL,
-  //     pass: GMAIL_PASSWORD,
-  //   },
-  // })
-
   const emailHtml = render({
     template: VerificationCode,
     props: { code: code, token: token },
   })
 
-  // const options = {
-  //   from: GMAIL_EMAIL,
-  //   to: 'enis.budancamanak@hotmail.com',
-  //   subject: `${code} is your activation code`,
-  //   html: emailHtml,
-  // }
-
-  // await transporter.sendMail(options)
-
   await sendEmail({
     from: 'enis.budancamanak@hotmail.com',
     to: 'enis.budancamanak@hotmail.com',
     subject: 'Verify Your Email Address',
+    html: emailHtml,
+  })
+}
+
+/**
+ *
+ * Generate Email Reset Token
+ *
+ */
+
+export const generateEmailResetToken = async (userId: string) => {
+  const storedUserTokens = await prisma.emailResetToken.findMany({
+    where: {
+      user_id: userId,
+    },
+  })
+
+  if (storedUserTokens.length > 0) {
+    const reusableStoredToken = storedUserTokens.find((token) => {
+      // check if expiration is within 1 hour
+      // and reuse the token if true
+      return isWithinExpiration(Number(token.expires) - EXPIRES_IN * 5) //Withing 25 minutes
+    })
+    if (reusableStoredToken) return reusableStoredToken.id
+  }
+  const token = generateRandomString(63)
+
+  await prisma.emailResetToken.create({
+    data: {
+      token: token,
+      expires: new Date().getTime() + EXPIRES_IN,
+      user_id: userId,
+    },
+  })
+
+  return token
+}
+
+/**
+ *
+ * Send Email Reset Email
+ *
+ */
+
+export const sendEmailResetEmail = async (
+  token: string | number,
+  oldEmail: string,
+  newEmail: string
+) => {
+  const emailHtml = render({
+    template: ResetEmail,
+    props: { token: token, oldEmail: oldEmail, newEmail: newEmail },
+  })
+
+  await sendEmail({
+    from: 'enis.budancamanak@hotmail.com',
+    to: 'enis.budancamanak@hotmail.com',
+    subject: 'Confirm Email change',
     html: emailHtml,
   })
 }

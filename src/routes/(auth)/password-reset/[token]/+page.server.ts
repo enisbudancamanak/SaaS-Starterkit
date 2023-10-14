@@ -27,11 +27,7 @@ export const load: PageServerLoad = async (event) => {
     })
   } catch (e: any) {
     if (e.message === 'Invalid token' || e.message === 'Expired token') {
-      throw redirect(
-        '/auth/signup',
-        { type: 'error', message: e.message },
-        event
-      )
+      throw redirect(302, '/', { type: 'error', message: e.message }, event)
     }
   }
 

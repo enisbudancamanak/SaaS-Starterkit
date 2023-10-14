@@ -2,11 +2,10 @@
   // Icons
   import PersonIcon from '~icons/material-symbols/person'
   import DeliveryIcon from '~icons/material-symbols/package-2'
-  import ChartIcon from '~icons/material-symbols/chart-data-rounded'
-  import CustomerIcon from '~icons/material-symbols/shopping-cart'
 
   // UI
   import SidebarNav from '$lib/components/sidebar.svelte'
+  import type { PageData } from './$types'
 
   // Items Sidebar
   const sidebarNavItems = [
@@ -15,7 +14,7 @@
       items: [
         {
           icon: PersonIcon,
-          title: 'Edit Profile',
+          title: 'Profile',
           href: '/settings/account',
         },
       ],

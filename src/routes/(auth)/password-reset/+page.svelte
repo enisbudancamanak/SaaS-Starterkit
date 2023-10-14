@@ -3,10 +3,6 @@
   import RandomLogo from '~icons/fa6-solid/blog'
 
   // UI
-  import { Button } from '$lib/components/ui/button'
-  import { Input } from '$lib/components/ui/input'
-  import { enhance } from '$app/forms'
-  import { goto } from '$app/navigation'
   import type { PageData } from './$types'
   import ResetPasswordForm from '$lib/components/auth/reset-password-form.svelte'
 

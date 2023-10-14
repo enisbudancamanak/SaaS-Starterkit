@@ -42,6 +42,13 @@ model PasswordResetToken {
   expires   BigInt
 }
 
+model EmailResetToken {
+  id        Int       @id @default(autoincrement())
+  user_id   String
+  token     String
+  expires   BigInt
+}
+
 model Session {
   id             String @id @unique
   user_id        String

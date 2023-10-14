@@ -2,9 +2,10 @@
   // Icons
   import RandomLogo from '~icons/fa6-solid/blog'
 
-  // UI
-  import type { PageData } from './$types'
+  // Components
   import PasswordInputChangeForm from '$lib/components/auth/password-input-change-form.svelte'
+
+  import type { PageData } from './$types'
 
   export let data: PageData
 </script>
@@ -30,7 +31,7 @@
       </p>
 
       <!-- Form -->
-      <PasswordInputChangeForm bind:form={data.form} email={data.email} />
+      <PasswordInputChangeForm form={data.form} email={data.email} />
     </div>
   </div>
 

@@ -34,6 +34,7 @@
     {#each element.items as item}
       <Button
         href={item.href}
+        data-sveltekit-noscroll
         variant="none"
         class={cn(
           $page.url.pathname === item.href

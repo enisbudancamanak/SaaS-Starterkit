@@ -108,6 +108,9 @@
     </DropdownMenu.Item>
     <DropdownMenu.Separator />
     <DropdownMenu.Item
+      on:click={(e) => {
+        e.preventDefault()
+      }}
       class="cursor-pointer text-destructive !p-0 !py-2 !px-2.5"
     >
       <LogOut class="w-4 h-4 mr-2" />

@@ -20,38 +20,41 @@ const months = [
 ]
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const [products, subscriptions, orders, customers, store] = await Promise.all(
-    [
-      ls.getProducts(),
-      ls.getSubscriptions(),
-      getAllOrders(await ls.getOrders({ page: 1, perPage: 10 })),
-      ls.getCustomers(),
-      ls.getStores(),
-    ]
-  )
+  const [orders, customers, store] = await Promise.all([
+    getAllOrders(),
+    ls.getCustomers(),
+    ls.getStores(),
+  ])
   const sortedOrders = sortMonths(getOrdersSortedByMonth(orders))
 
   return {
-    products: Promise.resolve(products),
+    totalRevenue: store.data[0].attributes.total_revenue + 0.01,
+    ordersTotal: orders.length,
     orders: Promise.resolve(orders),
     sortedOrders: Promise.resolve(sortedOrders),
-    subscriptions: Promise.resolve(subscriptions),
     customers: Promise.resolve(customers),
     store: Promise.resolve(store),
   }
 }
 
-async function getAllOrders(orders: any) {
-  let page = 2
-  while (page <= orders.meta.page.lastPage) {
-    await ls.getOrders({ page: page, perPage: 10 }).then((res) => {
-      orders.data = [...orders.data, ...res.data]
-    })
+async function getAllOrders() {
+  let hasNextPage = true
+  let perPage = 10
+  let page = 1
+  let data = []
+  while (hasNextPage) {
+    const resp = await ls.getOrders({ perPage, page })
 
-    page = page + 1
+    data = data.concat(resp['data'])
+
+    if (resp.meta.page.lastPage > page) {
+      page += 1
+    } else {
+      hasNextPage = false
+    }
   }
 
-  return orders
+  return data
 }
 
 function getOrdersSortedByMonth(orders: any) {
@@ -60,7 +63,7 @@ function getOrdersSortedByMonth(orders: any) {
     return {
       name: month,
       month: i + 1,
-      total: orders.data.reduce((acc: number, order: any) => {
+      total: orders.reduce((acc: number, order: any) => {
         const orderMonth = dayjs(order.attributes.created_at).month()
         const orderYear = dayjs(order.attributes.created_at).year()
 
@@ -74,7 +77,7 @@ function getOrdersSortedByMonth(orders: any) {
         }
         return acc
       }, 0),
-      orders: orders.data.filter((order: any) => {
+      orders: orders.filter((order: any) => {
         const orderMonth = dayjs(order.attributes.created_at).month()
 
         return orderMonth === i

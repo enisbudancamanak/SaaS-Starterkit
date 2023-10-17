@@ -9,7 +9,7 @@
 </script>
 
 <AlertDialogPrimitive.Description
-  class={cn('text-sm text-muted-foreground', className)}
+  class={cn('text-base text-muted-foreground', className)}
   {...$$restProps}
 >
   <slot />

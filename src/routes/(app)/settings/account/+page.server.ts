@@ -1,12 +1,18 @@
 import { setError, superValidate } from 'sveltekit-superforms/server'
 import type { PageServerLoad, Actions } from './$types'
 import { redirect, setFlash } from 'sveltekit-flash-message/server'
-import { updateProfileDetailsSchema } from '$lib/schema'
+import { updateProfileDetailsSchema, resetPasswordSchema } from '$lib/schema'
 import { fail } from '@sveltejs/kit'
 import { generateEmailResetToken, sendEmailResetEmail } from '$lib/server/token'
+import { auth } from '$lib/server/lucia'
 
 export const load: PageServerLoad = async (event) => {
-  return { form: superValidate(updateProfileDetailsSchema) }
+  const session = await event.locals.auth.validate()
+
+  return {
+    passwordForm: superValidate(resetPasswordSchema),
+    personalForm: superValidate(session?.user, updateProfileDetailsSchema),
+  }
 }
 
 export const actions: Actions = {
@@ -74,16 +80,56 @@ export const actions: Actions = {
   },
 
   updatePassword: async (event) => {
-    try {
-      setFlash({ type: 'success', message: 'Successfully logged in' }, event)
-    } catch (e: any) {
-      throw redirect(
-        { type: 'error', message: 'An unknown error occurred' },
-        event
-      )
+    const form = await superValidate(event.request, resetPasswordSchema)
+    const session = await event.locals.auth.validate()
+
+    if (session) {
+      const { user } = session
+      if (!form.valid) {
+        return fail(400, {
+          form,
+        })
+      }
+
+      try {
+        const key = await auth.useKey(
+          'email',
+          session.user.email.toLowerCase(),
+          form.data.current
+        )
+      } catch (e: any) {
+        if (e.message === 'AUTH_INVALID_PASSWORD') {
+          // user does not exist or invalid password
+          return setError(form, 'current', 'Wrong password. Try again.')
+        }
+      }
+
+      if (form.data.password === form.data.confirm) {
+        try {
+          await auth.invalidateAllUserSessions(user.userId)
+          await auth.updateKeyPassword('email', user.email, form.data.password)
+          setFlash(
+            { type: 'success', message: 'Successfully changed password' },
+            event
+          )
+
+          const session = await auth.createSession({
+            userId: user.userId,
+            attributes: {},
+          })
+
+          event.locals.auth.setSession(session) // set session cookie
+        } catch (e: any) {
+          throw redirect(
+            { type: 'error', message: 'An unknown error occurred' },
+            event
+          )
+        }
+
+        return { form }
+      }
     }
   },
-
   deleteAccount: async (event) => {
     try {
       setFlash({ type: 'success', message: 'Successfully logged in' }, event)

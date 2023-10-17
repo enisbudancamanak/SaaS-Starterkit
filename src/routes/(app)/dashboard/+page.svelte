@@ -19,22 +19,17 @@
 <Separator class="my-6" />
 
 <div class="flex flex-col gap-4">
-  <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+  <div class="grid gap-4 md:grid-cols-3">
     <ChartCard
       title="Total revenue"
-      value={data.store.data[0].attributes.total_revenue + 1}
+      value={data.totalRevenue}
       moneyPrefix={true}
     />
     <ChartCard
       title="Subscriptions"
-      value={data.subscriptions.data.length}
+      value={data.ordersTotal}
       decimalPlaces={0}
       moneyPrefix={false}
-    />
-    <ChartCard
-      title="Orders"
-      value={data.orders.meta.page.total}
-      decimalPlaces={0}
     />
     <ChartCard
       title="Visitors"

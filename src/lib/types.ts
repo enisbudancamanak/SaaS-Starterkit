@@ -3,4 +3,5 @@ type User = {
   email: string
   emailVerified: Boolean
   profilePicture: string
+  username: string
 }

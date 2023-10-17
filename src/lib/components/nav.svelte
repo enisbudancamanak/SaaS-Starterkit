@@ -33,6 +33,7 @@
   <div class="relative z-50 flex px-1 py-1 space-x-3">
     {#each navBarItems as item}
       <Button
+        data-sveltekit-preload-data="hover"
         href={item.href}
         variant="none"
         class={cn(

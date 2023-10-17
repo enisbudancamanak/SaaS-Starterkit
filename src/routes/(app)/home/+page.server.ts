@@ -11,8 +11,7 @@ export const load: PageServerLoad = async (event) => {
     if (!session.user.emailVerified) throw redirect(302, '/email-verification')
 
     return {
-      userId: session.user.userId,
-      email: session.user.email,
+      user: session.user,
     }
   } else {
     throw redirect(

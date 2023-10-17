@@ -15,7 +15,7 @@
   } from '$lib/schema'
   import type { SuperValidated } from 'sveltekit-superforms'
 
-  let openProfileSheet = false
+  let openSheet = false
 
   export let form: SuperValidated<UpdateProfileDetailsSchema>
   export let user: any
@@ -25,7 +25,7 @@
   <h4>Personal Info</h4>
 
   <!-- Edit Button => open Sheet -->
-  <Sheet.Root bind:open={openProfileSheet}>
+  <Sheet.Root bind:open={openSheet}>
     <Sheet.Trigger asChild let:builder>
       <Button builders={[builder]} variant="outline" size="sm">
         <Pencil class="w-4 h-4 mr-2" />
@@ -53,12 +53,12 @@
             // do something
             if (e.form.valid) {
               // close sheet on form success
-              openProfileSheet = false
+              openSheet = false
             }
           },
         }}
       >
-        <div class="grid gap-4 py-4">
+        <div class="grid">
           <Form.Field {config} name="name">
             <Form.Item>
               <Form.Label>Name</Form.Label>
@@ -72,7 +72,7 @@
           </Form.Field>
 
           <Form.Field {config} name="email">
-            <Form.Item class="flex-1">
+            <Form.Item>
               <Form.Label>E-Mail</Form.Label>
               <Form.Input
                 type="email"
@@ -82,14 +82,14 @@
               <Form.Validation />
             </Form.Item>
           </Form.Field>
-        </div>
 
-        <Form.Button type="submit">
-          {#if submitting}
-            <Spinner class="w-4 h-4 mr-2" />
-          {/if}
-          Save changes</Form.Button
-        >
+          <Form.Button type="submit">
+            {#if submitting}
+              <Spinner class="w-4 h-4 mr-2" />
+            {/if}
+            Save changes
+          </Form.Button>
+        </div>
       </Form.Root>
     </Sheet.Content>
   </Sheet.Root>

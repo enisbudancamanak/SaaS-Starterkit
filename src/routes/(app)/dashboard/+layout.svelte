@@ -3,6 +3,7 @@
   import OverviewIcon from '~icons/ph/squares-four-bold'
   import DeliveryIcon from '~icons/material-symbols/package-2'
   import CustomerIcon from '~icons/material-symbols/shopping-cart'
+  import SubscriptionIcon from '~icons/material-symbols/payments'
 
   // UI
   import SidebarNav from '$lib/components/sidebar.svelte'

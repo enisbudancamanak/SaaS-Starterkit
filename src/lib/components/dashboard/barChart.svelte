@@ -12,8 +12,6 @@
   $: if (orders) {
     ordersSliced = orders
 
-    console.log(orders)
-
     totalSum = orders.reduce((a: any, b: any) => a + b.total, 0)
   }
 

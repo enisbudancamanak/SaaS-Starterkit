@@ -9,18 +9,14 @@
 
 <div class="flex w-full gap-4">
   <!-- GitHub -->
-  <a class="flex-1" href="/oauth/github">
-    <Button class="w-full" variant="outline" type="button">
-      <GithubIcon class="w-4 h-4 mr-2" />
-      GitHub
-    </Button>
-  </a>
+  <Button href="/oauth/github" class="flex-1 w-full" variant="outline">
+    <GithubIcon class="w-4 h-4 mr-2" />
+    GitHub
+  </Button>
 
   <!-- Google -->
-  <a class="flex-1" href="/oauth/google">
-    <Button class="w-full" variant="outline" type="button">
-      <GoogleIcon class="w-4 h-4 mr-2" />
-      Google
-    </Button>
-  </a>
+  <Button href="/oauth/google" class="flex-1 w-full" variant="outline">
+    <GoogleIcon class="w-4 h-4 mr-2" />
+    Google
+  </Button>
 </div>

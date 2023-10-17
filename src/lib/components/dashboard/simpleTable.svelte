@@ -14,7 +14,7 @@
   }
 
   const orders: Order[] = [
-    ...ordersData.data.slice(0, 5).map((order: any) => ({
+    ...ordersData.slice(0, 5).map((order: any) => ({
       id: order.id,
       status: order.attributes.status_formatted as Order['status'],
       totalAmount: order.attributes.total_formatted,

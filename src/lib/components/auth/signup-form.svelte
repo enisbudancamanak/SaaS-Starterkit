@@ -46,7 +46,7 @@
           <Form.Label>Name</Form.Label>
           <Form.Input
             type="text"
-            placeholder="Enter your name"
+            placeholder="Enter your full name"
             disabled={submitting}
           />
           <Form.Validation />

@@ -45,6 +45,7 @@ export const actions: Actions = {
           name: form.data.name,
           email: form.data.email.toLowerCase(),
           email_verified: false,
+          profile_picture: '',
         },
       })
 
@@ -54,10 +55,10 @@ export const actions: Actions = {
       })
       event.locals.auth.setSession(session) // set session cookie
 
-      // const code = await generateVerificationToken(user.userId)
-      // const token = await generateEmailVerificationToken(user.userId)
+      const code = await generateVerificationToken(user.userId)
+      const token = await generateEmailVerificationToken(user.userId)
 
-      // await sendVerificationEmail(code, token)
+      await sendVerificationEmail(code, token)
 
       setFlash(
         { message: 'E-Mail sent, check your inbox!', type: 'success' },

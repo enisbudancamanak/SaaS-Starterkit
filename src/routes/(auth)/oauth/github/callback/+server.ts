@@ -36,22 +36,28 @@ export const GET: PageServerLoad = async (event) => {
     const { getExistingUser, githubUser, createUser, createKey, githubTokens } =
       await githubAuth.validateCallback(code)
 
-    const primaryEmail = await fetchEmailFromUser(githubTokens)
-
     const getUser = async () => {
       const existingUser = await getExistingUser()
       if (existingUser) return existingUser
 
-      if (!primaryEmail.verified) {
-        throw redirect(
-          '/auth/login',
-          { type: 'error', message: 'GitHub Email is not verified' },
-          event
-        )
+      let githubUserEmail = githubUser.email
+
+      if (!githubUserEmail) {
+        const email = await fetchEmailFromUser(githubTokens)
+
+        if (!email) {
+          throw redirect(
+            '/auth/login',
+            { type: 'error', message: 'GitHub Email is not verified' },
+            event
+          )
+        } else {
+          githubUserEmail = email.email
+        }
       }
 
       const existingDatabaseUserWithEmail = await getUserByEmail(
-        primaryEmail.email.toLowerCase()
+        githubUserEmail.toLowerCase()
       )
 
       if (existingDatabaseUserWithEmail) {
@@ -62,7 +68,8 @@ export const GET: PageServerLoad = async (event) => {
 
       return await createUser({
         attributes: {
-          email: primaryEmail.email.toLowerCase(),
+          github_username: githubUser.login,
+          email: githubUserEmail.toLowerCase(),
           email_verified: true,
           name: githubUser.login,
           profile_picture: githubUser.avatar_url,
@@ -73,6 +80,7 @@ export const GET: PageServerLoad = async (event) => {
     const user = await getUser()
 
     await auth.updateUserAttributes(user.userId, {
+      github_username: githubUser.login,
       email_verified: true,
       profile_picture: user.profilePicture
         ? user.profilePicture

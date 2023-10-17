@@ -1,73 +1,100 @@
 <script lang="ts">
+  // @ts-nocheck because of the form config unfortunaetly
+  import Pencil from '~icons/lucide/pencil'
   import Spinner from '~icons/svg-spinners/180-ring-with-bg'
 
-  import { Button, buttonVariants } from '$lib/components/ui/button'
-  import * as Dialog from '$lib/components/ui/dialog'
+  import { Button } from '$lib/components/ui/button'
+  import * as Sheet from '$lib/components/ui/sheet'
   import * as Form from '$lib/components/ui/form'
 
   import { resetPasswordSchema, type ResetPasswordSchema } from '$lib/schema'
   import type { SuperValidated } from 'sveltekit-superforms'
 
+  let openSheet = false
   export let form: SuperValidated<ResetPasswordSchema>
 </script>
 
 <h4>Password</h4>
 
 <div>
-  <Dialog.Root>
-    <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
-      Set new password
-    </Dialog.Trigger>
-    <Dialog.Content class="sm:max-w-[425px]">
-      <Dialog.Header>
-        <Dialog.Title>Set new password</Dialog.Title>
-        <!-- <Dialog.Description>
-          Make changes to your profile here. Click save when you're done.
-        </Dialog.Description> -->
-      </Dialog.Header>
+  <!-- Edit Button => open Sheet -->
+  <Sheet.Root bind:open={openSheet}>
+    <Sheet.Trigger asChild let:builder>
+      <Button builders={[builder]} variant="outline" size="sm">
+        <Pencil class="w-4 h-4 mr-2" />
+        Set new password
+      </Button>
+    </Sheet.Trigger>
+    <Sheet.Content side="right">
+      <Sheet.Header>
+        <Sheet.Title>Edit password</Sheet.Title>
+        <Sheet.Description>
+          Make changes to your password here. Click save when you're done.
+        </Sheet.Description>
+      </Sheet.Header>
+
       <Form.Root
         method="POST"
         {form}
+        action="?/updatePassword"
         schema={resetPasswordSchema}
         let:config
-        let:delayed
+        let:submitting
+        options={{
+          validators: resetPasswordSchema,
+          onUpdated: (e) => {
+            // do something
+            if (e.form.valid) {
+              // close sheet on form success
+              openSheet = false
+            }
+          },
+        }}
       >
-        <div class="grid gap-3 py-3">
-          <Form.Field {config} name="password">
-            <Form.Label>Password</Form.Label>
+        <div class="grid">
+          <Form.Field {config} name="current">
             <Form.Item>
+              <Form.Label>Current Password</Form.Label>
+              <Form.Input
+                type="password"
+                placeholder="Enter your current password"
+                disabled={submitting}
+              />
+              <Form.Validation />
+            </Form.Item>
+          </Form.Field>
+          <Form.Field {config} name="password">
+            <Form.Item>
+              <Form.Label>Password</Form.Label>
               <Form.Input
                 type="password"
                 placeholder="Enter your password"
-                disabled={delayed}
+                disabled={submitting}
               />
               <Form.Validation />
             </Form.Item>
           </Form.Field>
 
           <Form.Field {config} name="confirm">
-            <Form.Label>Confirm Password</Form.Label>
             <Form.Item>
+              <Form.Label>Confirm Password</Form.Label>
               <Form.Input
                 type="password"
                 placeholder="Confirm your password"
-                disabled={delayed}
+                disabled={submitting}
               />
               <Form.Validation />
             </Form.Item>
           </Form.Field>
 
-          <Form.Button class="w-full" disabled={delayed}>
-            {#if delayed}
-              <Spinner class="w-4 h-4 mr-2 animate-spin" />
+          <Form.Button type="submit">
+            {#if submitting}
+              <Spinner class="w-4 h-4 mr-2" />
             {/if}
-            Continue
-          </Form.Button>
+            Save changes</Form.Button
+          >
         </div>
       </Form.Root>
-      <!-- <Dialog.Footer>
-        <Button type="submit">Save changes</Button>
-      </Dialog.Footer> -->
-    </Dialog.Content>
-  </Dialog.Root>
+    </Sheet.Content>
+  </Sheet.Root>
 </div>

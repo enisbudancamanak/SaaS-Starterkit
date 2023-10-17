@@ -35,9 +35,12 @@ export const GET: PageServerLoad = async (event) => {
     const { getExistingUser, googleUser, createUser, createKey } =
       await googleAuth.validateCallback(code)
 
+    console.log(googleUser)
+
     const getUser = async () => {
       const existingUser = await getExistingUser()
       if (existingUser) return existingUser
+
       if (!googleUser.email_verified) {
         throw redirect(
           '/auth/login',
@@ -53,9 +56,11 @@ export const GET: PageServerLoad = async (event) => {
         // transform `UserSchema` to `User`
         const user = auth.transformDatabaseUser(existingDatabaseUserWithEmail)
         await createKey(user.userId)
+
         return user
       }
-      return await createUser({
+
+      const user = await createUser({
         attributes: {
           email: googleUser.email?.toLowerCase() as string,
           email_verified: true,
@@ -63,6 +68,8 @@ export const GET: PageServerLoad = async (event) => {
           profile_picture: googleUser.picture,
         },
       })
+
+      return user
     }
 
     const user = await getUser()
@@ -107,16 +114,4 @@ function getUserByEmail(email: string) {
       email: email.toLowerCase(),
     },
   })
-}
-
-type GoogleUser = {
-  sub: string
-  name: string
-  given_name: string
-  family_name: string
-  picture: string
-  locale: string
-  email?: string
-  email_verified?: boolean
-  hd?: string
 }

@@ -12,6 +12,7 @@ export const GET: PageServerLoad = async ({ cookies }) => {
     path: '/',
     maxAge: 60 * 60,
   })
+
   return new Response(null, {
     status: 302,
     headers: {

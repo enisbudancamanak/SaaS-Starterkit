@@ -10,12 +10,17 @@
   // Items Sidebar
   const sidebarNavItems = [
     {
-      title: 'Profile',
+      title: 'Account',
       items: [
         {
           icon: PersonIcon,
           title: 'Profile',
           href: '/settings/account',
+        },
+        {
+          icon: PersonIcon,
+          title: 'Login Connections',
+          href: '/settings/account/login-connections',
         },
       ],
     },
@@ -23,28 +28,13 @@
       title: 'Bank',
       items: [
         {
-          icon: PersonIcon,
-          title: 'Invoices',
-          href: '/dashboard',
-        },
-        {
           icon: DeliveryIcon,
           title: 'Billing',
           href: '/dashboard/orders',
         },
-      ],
-    },
-    {
-      title: 'Secure',
-      items: [
         {
           icon: PersonIcon,
-          title: 'Password',
-          href: '/dashboard',
-        },
-        {
-          icon: PersonIcon,
-          title: 'Login Connections',
+          title: 'Invoices',
           href: '/dashboard',
         },
       ],

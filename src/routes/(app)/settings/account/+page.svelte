@@ -1,10 +1,10 @@
 <script lang="ts">
   // Components
-  import Card from '$lib/components/settings/card.svelte'
   import PersonalInfo from '$lib/components/settings/profile/personalInfo.svelte'
   import DeleteAccount from '$lib/components/settings/profile/deleteAccount.svelte'
   import ChangePassword from '$lib/components/settings/profile/changePassword.svelte'
 
+  import Card from '$lib/components/settings/card.svelte'
   import Avatar from '$lib/components/settings/profile/avatar.svelte'
   import { Separator } from '$lib/components/ui/separator'
 
@@ -23,15 +23,15 @@
 <Card class="p-6 !h-fit bg-accent/40 mb-4">
   <Avatar user={data.user} />
 
-  <Separator class="my-6" />
+  <Separator class="my-4" />
 
-  <div class="flex flex-col gap-4 p-6 border rounded-xl dark:bg-accent/40">
-    <PersonalInfo form={data.form} user={data.user} />
+  <div class="flex flex-col gap-4 p-6 border rounded-xl bg-accent/40">
+    <PersonalInfo form={data.personalForm} user={data.user} />
   </div>
   <Separator class="my-4" />
 
-  <div class="flex flex-col gap-4 p-6 border rounded-xl dark:bg-accent/40">
-    <ChangePassword form={data.form} />
+  <div class="flex flex-col gap-4 p-6 border rounded-xl bg-accent/40">
+    <ChangePassword form={data.passwordForm} />
   </div>
 </Card>
 

@@ -3,6 +3,7 @@
   import GithubIcon from '~icons/mdi/github'
   import GoogleIcon from '~icons/mdi/google'
   import EmailIcon from '~icons/mdi/email'
+  import ArrowURight from '~icons/lucide/arrow-up-right'
 
   // Components
   import Card from '$lib/components/settings/card.svelte'
@@ -31,14 +32,59 @@
             <div class="flex flex-col gap-0">
               <h5 class="font-bold">GitHub</h5>
               <a
+                target="_blank"
                 class="text-sm link text-muted-foreground"
-                href={'https://gtihub.com/' + login.name}
+                href={'https://github.com/' + login.name}
               >
                 {'@'}{login.name}
               </a>
             </div>
+            <div
+              class="flex flex-col items-end flex-1 gap-2 text-sm text-muted-foreground"
+            >
+              <span>
+                Connected
+                <Time relative live class="" timestamp={login.created_at} />
+              </span>
+              <div>
+                <Button
+                  target="_blank"
+                  href="https://github.com/settings/connections/applications/4fc8bf033de79e87363d"
+                  variant="outline"
+                  size="sm"
+                  >Manage on github.com <ArrowURight
+                    class="w-5 h-5 ml-2"
+                  /></Button
+                >
+              </div>
+            </div>
           {:else if login.provider === 'google'}
             <GoogleIcon class="w-6 h-6 mr-2" />
+            <div class="flex flex-col gap-0">
+              <h5 class="font-bold">Google</h5>
+              <span class="text-sm link text-muted-foreground">
+                {login.email}
+              </span>
+            </div>
+            <div
+              class="flex flex-col items-end flex-1 gap-2 text-sm text-muted-foreground"
+            >
+              <span>
+                Connected
+                <Time relative live class="" timestamp={login.created_at} />
+              </span>
+              <div>
+                <Button
+                  target="_blank"
+                  href="https://myaccount.google.com/connections/overview/ChQaEgoNMTAwNjM3MjE2MTM4OBoBBA"
+                  variant="outline"
+                  size="sm"
+                  >Manage on google.com <ArrowURight
+                    class="w-5 h-5 ml-2"
+                  /></Button
+                >
+              </div>
+            </div>
           {:else if login.provider === 'email'}
             <EmailIcon class="w-6 h-6 mr-2" />
             <div class="flex flex-col gap-0">
@@ -47,20 +93,15 @@
                 {login.name}
               </span>
             </div>
+            <div class="flex-1 text-sm text-right text-muted-foreground">
+              Connected
+              <Time relative live class="" timestamp={login.created_at} />
+            </div>
           {/if}
-
-          <div class="flex-1 text-sm text-right text-muted-foreground">
-            Connected
-            <Time
-              relative
-              class=""
-              timestamp={login.created_at}
-              format="ddd D MMM"
-            />
-          </div>
-          <Button variant="ghost" size="sm">...</Button>
         </div>
       {/each}
     </div>
   {/if}
 </Card>
+
+<!-- Manage: https://github.com/settings/connections/applications/4fc8bf033de79e87363d -->

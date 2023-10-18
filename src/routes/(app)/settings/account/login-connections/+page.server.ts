@@ -22,6 +22,7 @@ export const load: PageServerLoad = async (event) => {
         name: login.id.includes('github')
           ? login.user.github_username
           : login.id.split(':')[1],
+        email: login.user.email,
       })),
     ]
 

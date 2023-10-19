@@ -25,6 +25,7 @@ declare global {
       email: string
       email_verified: Boolean
       profile_picture: string
+      github_username: string
     }
     type DatabaseSessionAttributes = Record<string, never>
   }

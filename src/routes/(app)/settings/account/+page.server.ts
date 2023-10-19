@@ -5,6 +5,7 @@ import { updateProfileDetailsSchema, resetPasswordSchema } from '$lib/schema'
 import { fail } from '@sveltejs/kit'
 import { generateEmailResetToken, sendEmailResetEmail } from '$lib/server/token'
 import { auth } from '$lib/server/lucia'
+import { BASE_URL } from '$env/static/private'
 
 export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
@@ -52,7 +53,10 @@ export const actions: Actions = {
           },
         })
         if (duplicatedEmail == null) {
-          const token = await generateEmailResetToken(session.user.id)
+          const token = await generateEmailResetToken(
+            session.user.id,
+            form.data.email
+          )
           await sendEmailResetEmail(token, session.user.email, form.data.email)
 
           setFlash(
@@ -68,36 +72,59 @@ export const actions: Actions = {
     return { form }
   },
 
-  // updateProfilePicture: async (e) => {
-  //   const file = (await e.request.formData()).get('file')
+  updateProfilePicture: async (event) => {
+    const { request, locals } = event
+    const formData = await request.formData()
 
-  //   if (file) {
-  //     const getPresignedUrlResponse = await fetch('/api/upload', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         fileName: file.name,
-  //         fileType: file.type,
-  //       }),
-  //     })
+    const file = formData.get('avatar') as File
 
-  //     if (!getPresignedUrlResponse.ok) {
-  //       console.error('Failed to get presigned URL')
-  //     }
+    const session = await locals.auth.validate()
+    if (file && session) {
+      try {
+        const getPresignedUrlResponse = await fetch(`${BASE_URL}/api/upload`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: session.user.userId,
+            fileName: file.name,
+            fileType: file.type,
+            previousImage: session.user.profilePicture,
+          }),
+        })
 
-  //     const { presignedUrl, objectKey } = await getPresignedUrlResponse.json()
-  //     // try {
-  //     //   setFlash({ type: 'success', message: 'Successfully logged in' }, event)
-  //     // } catch (e: any) {
-  //     //   throw redirect(
-  //     //     { type: 'error', message: 'An unknown error occurred' },
-  //     //     event
-  //     //   )
-  //     // }
-  //   }
-  // },
+        if (!getPresignedUrlResponse.ok) {
+          console.error('Failed to get presigned URL')
+        }
+
+        const { presignedUrl } = await getPresignedUrlResponse.json()
+
+        const uploadToR2Response = await fetch(presignedUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': file.type,
+          },
+          body: file,
+        })
+
+        if (!uploadToR2Response.ok) {
+          console.error('Failed to upload file to R2')
+
+          setFlash(
+            { message: 'Failed to upload picture', type: 'error' },
+            event
+          )
+        }
+        setFlash({ message: 'Picture uploaded!', type: 'success' }, event)
+      } catch (e: any) {
+        throw redirect(
+          { type: 'error', message: 'An unknown error occurred' },
+          event
+        )
+      }
+    }
+  },
   updatePassword: async (event) => {
     const form = await superValidate(event.request, resetPasswordSchema)
     const session = await event.locals.auth.validate()

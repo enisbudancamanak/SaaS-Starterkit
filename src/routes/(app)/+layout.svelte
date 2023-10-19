@@ -1,7 +1,6 @@
 <script lang="ts">
   import Nav from '$lib/components/nav.svelte'
   import ProfileMenu from '$lib/components/profileMenu.svelte'
-  // import ThemeSwitch from '$lib/components/themeSwitch.svelte'
   import type { PageData } from '../$types'
 
   export let data: PageData
@@ -14,7 +13,7 @@
   <Nav />
   <!-- Right Navigation -->
   <div class="flex justify-end flex-1 ml-auto">
-    <ProfileMenu user={data.user} />
+    <ProfileMenu bind:user={data.user} />
   </div>
 </nav>
 

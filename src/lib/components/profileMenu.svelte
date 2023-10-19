@@ -7,9 +7,9 @@
 
   import * as Select from '$lib/components/ui/select'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
-  import * as Avatar from '$lib/components/ui/avatar'
   import { Button } from '$lib/components/ui/button'
   import CardGlance from './cardGlance.svelte'
+  import Avatar from './avatar.svelte'
 
   import { enhance } from '$app/forms'
 
@@ -44,16 +44,12 @@
           <span>{user.name}</span>
           <span class="text-xs text-muted-foreground">Super Admin</span>
         </div>
-        <Avatar.Root class="w-8 h-8 rounded-sm">
-          <Avatar.Image
-            src={parseProfilePictureUrl(user.profilePicture)}
-            class="object-cover"
-            alt={'profilePicture'}
-          />
-          <Avatar.Fallback class="uppercase"
-            >{user.name.slice(0, 2)}</Avatar.Fallback
-          >
-        </Avatar.Root>
+
+        <Avatar
+          src={user.profilePicture}
+          alt={'Profile Picture'}
+          fallback={user.name.slice(0, 2)}
+        />
       </CardGlance>
     </Button>
   </DropdownMenu.Trigger>

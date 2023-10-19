@@ -13,6 +13,7 @@
   // Types
   import type { PageData } from './$types'
   import Time from 'svelte-time/src/Time.svelte'
+  import { enhance } from '$app/forms'
 
   export let data: PageData
 </script>
@@ -46,16 +47,26 @@
                 Connected
                 <Time relative live class="" timestamp={login.created_at} />
               </span>
-              <div>
+              <div class="flex gap-2">
                 <Button
                   target="_blank"
                   href="https://github.com/settings/connections/applications/4fc8bf033de79e87363d"
                   variant="outline"
                   size="sm"
-                  >Manage on github.com <ArrowURight
-                    class="w-5 h-5 ml-2"
-                  /></Button
-                >
+                  >Manage <ArrowURight class="w-4 h-4 ml-1" />
+                </Button>
+                {#if data.primaryEmail}
+                  <form use:enhance method="post" action="?/disconnect">
+                    <input type="text" name="id" value={login.id} hidden />
+                    <Button
+                      class="text-destructive"
+                      target="_blank"
+                      variant="outline"
+                      size="sm"
+                      >Disconnect
+                    </Button>
+                  </form>
+                {/if}
               </div>
             </div>
           {:else if login.provider === 'google'}
@@ -73,16 +84,25 @@
                 Connected
                 <Time relative live class="" timestamp={login.created_at} />
               </span>
-              <div>
+              <div class="flex gap-2">
                 <Button
                   target="_blank"
                   href="https://myaccount.google.com/connections/overview/ChQaEgoNMTAwNjM3MjE2MTM4OBoBBA"
                   variant="outline"
-                  size="sm"
-                  >Manage on google.com <ArrowURight
-                    class="w-5 h-5 ml-2"
-                  /></Button
+                  size="sm">Manage <ArrowURight class="w-4 h-4 ml-1" /></Button
                 >
+                {#if data.primaryEmail}
+                  <form use:enhance method="post" action="?/disconnect">
+                    <input type="text" name="id" value={login.id} hidden />
+                    <Button
+                      class="text-destructive"
+                      target="_blank"
+                      variant="outline"
+                      size="sm"
+                      >Disconnect
+                    </Button>
+                  </form>
+                {/if}
               </div>
             </div>
           {:else if login.provider === 'email'}

@@ -12,9 +12,9 @@ export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
 
   const { params } = event
-  let user: any
   token = params.token
 
+  let user: any
   try {
     const userId = await validatePasswordResetToken(params.token)
     user = await prisma.user.findFirst({

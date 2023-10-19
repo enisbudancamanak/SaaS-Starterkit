@@ -108,19 +108,17 @@ export const validateVerificationToken = async (
  */
 
 export const generateEmailVerificationToken = async (user_id: string) => {
-  const storedUserTokens = await prisma.emailVerificationToken.findMany({
+  const storedUserToken = await prisma.emailVerificationToken.findFirst({
     where: {
       user_id,
     },
   })
 
-  if (storedUserTokens.length > 0) {
-    const reusableStoredToken = storedUserTokens.find((token) => {
-      // check if expiration is within 25 minutes
-      // and reuse the token if true
-      return isWithinExpiration(Number(token.expires) - EXPIRES_IN * 5)
-    })
-    if (reusableStoredToken) return reusableStoredToken.id
+  if (storedUserToken) {
+    const reusableStoredToken = isWithinExpiration(
+      Number(storedUserToken.expires) - EXPIRES_IN * 5
+    )
+    if (reusableStoredToken) return storedUserToken.id
   }
   const token = generateRandomString(63)
 
@@ -146,7 +144,7 @@ export const validateEmailVerificationToken = async (token: string) => {
       if (!storedToken) throw new Error('Invalid token')
 
       if (storedToken) {
-        prisma.emailVerificationToken.delete({
+        await prisma.emailVerificationToken.deleteMany({
           // @ts-ignore
           where: {
             user_id: storedToken.user_id,
@@ -168,19 +166,19 @@ export const validateEmailVerificationToken = async (token: string) => {
  */
 
 export const generatePasswordResetToken = async (userId: string) => {
-  const storedUserTokens = await prisma.passwordResetToken.findMany({
+  const storedUserToken = await prisma.passwordResetToken.findFirst({
     where: {
       user_id: userId,
     },
   })
 
-  if (storedUserTokens.length > 0) {
-    const reusableStoredToken = storedUserTokens.find((token) => {
-      // check if expiration is within 1 hour
-      // and reuse the token if true
-      return isWithinExpiration(Number(token.expires) - EXPIRES_IN * 5) //Withing 25 minutes
-    })
-    if (reusableStoredToken) return reusableStoredToken.id
+  if (storedUserToken) {
+    // check if expiration is within 1 hour
+    // and reuse the token if true
+    const reusableStoredToken = isWithinExpiration(
+      Number(storedUserToken.expires) - EXPIRES_IN * 5
+    ) //Withing 25 minutes
+    if (reusableStoredToken) storedUserToken.id
   }
   const token = generateRandomString(63)
 
@@ -206,7 +204,7 @@ export const validatePasswordResetToken = async (token: string) => {
       if (!storedToken) throw new Error('Invalid token')
 
       if (storedToken)
-        prisma.passwordResetToken.delete({
+        await prisma.passwordResetToken.deleteMany({
           // @ts-ignore
           where: {
             user_id: storedToken.user_id,
@@ -270,20 +268,23 @@ export const sendVerificationEmail = async (
  *
  */
 
-export const generateEmailResetToken = async (userId: string) => {
-  const storedUserTokens = await prisma.emailResetToken.findMany({
+export const generateEmailResetToken = async (
+  userId: string,
+  newEmail: string
+) => {
+  const storedUserToken = await prisma.emailResetToken.findFirst({
     where: {
       user_id: userId,
     },
   })
 
-  if (storedUserTokens.length > 0) {
-    const reusableStoredToken = storedUserTokens.find((token) => {
-      // check if expiration is within 1 hour
-      // and reuse the token if true
-      return isWithinExpiration(Number(token.expires) - EXPIRES_IN * 5) //Withing 25 minutes
-    })
-    if (reusableStoredToken) return reusableStoredToken.id
+  if (storedUserToken) {
+    // check if expiration is within 1 hour
+    // and reuse the token if true
+    const reusableStoredToken = isWithinExpiration(
+      Number(storedUserToken.expires) - EXPIRES_IN * 5
+    )
+    if (reusableStoredToken) return storedUserToken.id
   }
   const token = generateRandomString(63)
 
@@ -292,6 +293,7 @@ export const generateEmailResetToken = async (userId: string) => {
       token: token,
       expires: new Date().getTime() + EXPIRES_IN,
       user_id: userId,
+      new_email: newEmail,
     },
   })
 
@@ -320,4 +322,38 @@ export const sendEmailResetEmail = async (
     subject: 'Confirm Email change',
     html: emailHtml,
   })
+}
+
+/**
+ *
+ * Validate Email Reset token
+ *
+ */
+
+export const validateEmailResetToken = async (token: string) => {
+  const storedToken = await prisma.emailResetToken
+    .findFirst({
+      where: {
+        token,
+      },
+    })
+    .then(async (storedToken) => {
+      if (!storedToken) throw new Error('Invalid token')
+
+      if (storedToken) {
+        await prisma.emailResetToken.deleteMany({
+          // @ts-ignore
+          where: {
+            user_id: storedToken.user_id,
+          },
+        })
+      }
+      return storedToken
+    })
+
+  // bigint => number conversion
+  if (!isWithinExpiration(Number(storedToken.expires))) {
+    throw new Error('Expired token')
+  }
+  return storedToken.new_email
 }

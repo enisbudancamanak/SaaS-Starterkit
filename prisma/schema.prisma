@@ -50,6 +50,7 @@ model EmailResetToken {
   user_id   String
   token     String
   expires   BigInt
+  new_email String
 }
 
 model Session {

@@ -103,8 +103,6 @@ export const GET: PageServerLoad = async (event) => {
       },
     })
   } catch (e) {
-    console.log(e)
-
     if (e instanceof OAuthRequestError) {
       // invalid code
       return new Response(null, {

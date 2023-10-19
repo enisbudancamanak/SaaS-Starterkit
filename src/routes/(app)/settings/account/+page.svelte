@@ -21,7 +21,7 @@
 
 <!-- Edit Profile -->
 <Card class="p-6 !h-fit bg-accent/40 mb-4">
-  <Avatar user={data.user} />
+  <Avatar bind:user={data.user} />
 
   <Separator class="my-4" />
 

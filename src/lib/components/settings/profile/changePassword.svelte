@@ -43,7 +43,6 @@
         options={{
           validators: resetPasswordSchema,
           onUpdated: (e) => {
-            // do something
             if (e.form.valid) {
               // close sheet on form success
               openSheet = false

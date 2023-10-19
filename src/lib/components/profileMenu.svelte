@@ -1,8 +1,5 @@
 <script lang="ts">
-  import Cloud from '~icons/lucide/cloud'
   import CreditCard from '~icons/lucide/credit-card'
-  import GitHub from '~icons/lucide/github'
-  import Keyboard from '~icons/lucide/keyboard'
   import LogOut from '~icons/lucide/log-out'
   import Paintbrush2 from '~icons/lucide/paintbrush2'
   import User from '~icons/lucide/user'
@@ -22,6 +19,7 @@
     enableLightMode,
     enableSystemMode,
   } from '$lib/themeSwitchHandler'
+  import { parseProfilePictureUrl } from '$lib/utils'
 
   export let user: any
   let open: boolean = false
@@ -47,7 +45,11 @@
           <span class="text-xs text-muted-foreground">Super Admin</span>
         </div>
         <Avatar.Root class="w-8 h-8 rounded-sm">
-          <Avatar.Image src={user.profilePicture} alt={'profilePicture'} />
+          <Avatar.Image
+            src={parseProfilePictureUrl(user.profilePicture)}
+            class="object-cover"
+            alt={'profilePicture'}
+          />
           <Avatar.Fallback class="uppercase"
             >{user.name.slice(0, 2)}</Avatar.Fallback
           >

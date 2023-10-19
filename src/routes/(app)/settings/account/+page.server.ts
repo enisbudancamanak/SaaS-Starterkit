@@ -68,17 +68,36 @@ export const actions: Actions = {
     return { form }
   },
 
-  updateProfilePicture: async (event) => {
-    try {
-      setFlash({ type: 'success', message: 'Successfully logged in' }, event)
-    } catch (e: any) {
-      throw redirect(
-        { type: 'error', message: 'An unknown error occurred' },
-        event
-      )
-    }
-  },
+  // updateProfilePicture: async (e) => {
+  //   const file = (await e.request.formData()).get('file')
 
+  //   if (file) {
+  //     const getPresignedUrlResponse = await fetch('/api/upload', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         fileName: file.name,
+  //         fileType: file.type,
+  //       }),
+  //     })
+
+  //     if (!getPresignedUrlResponse.ok) {
+  //       console.error('Failed to get presigned URL')
+  //     }
+
+  //     const { presignedUrl, objectKey } = await getPresignedUrlResponse.json()
+  //     // try {
+  //     //   setFlash({ type: 'success', message: 'Successfully logged in' }, event)
+  //     // } catch (e: any) {
+  //     //   throw redirect(
+  //     //     { type: 'error', message: 'An unknown error occurred' },
+  //     //     event
+  //     //   )
+  //     // }
+  //   }
+  // },
   updatePassword: async (event) => {
     const form = await superValidate(event.request, resetPasswordSchema)
     const session = await event.locals.auth.validate()

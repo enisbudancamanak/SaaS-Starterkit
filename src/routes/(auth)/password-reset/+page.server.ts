@@ -32,7 +32,6 @@ export const actions: Actions = {
       })
     }
     try {
-      // query from user table
       const storedUser = await prisma.user.findFirst({
         where: {
           email: form.data.email.toLowerCase(),

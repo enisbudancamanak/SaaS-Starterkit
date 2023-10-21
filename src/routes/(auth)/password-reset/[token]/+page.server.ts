@@ -7,6 +7,7 @@ import { superValidate } from 'sveltekit-superforms/server'
 import type { PageServerLoad } from './$types'
 
 let token: string
+let user: any
 
 export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
@@ -14,26 +15,27 @@ export const load: PageServerLoad = async (event) => {
   const { params } = event
   token = params.token
 
-  let user: any
-  try {
-    const userId = await validatePasswordResetToken(params.token)
-    user = await prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-      select: {
-        email: true,
-      },
-    })
-  } catch (e: any) {
-    if (e.message === 'Invalid token' || e.message === 'Expired token') {
-      throw redirect(302, '/', { type: 'error', message: e.message }, event)
-    }
-  }
-
   if (session) {
     if (!session.user.emailVerified) throw redirect(302, '/email-verification')
     throw redirect(302, '/home')
+  } else {
+    try {
+      const { userId } = await validatePasswordResetToken(params.token)
+      user = await prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+      })
+    } catch (e: any) {
+      if (e.message === 'Invalid token' || e.message === 'Expired token') {
+        throw redirect(
+          302,
+          '/auth/login',
+          { type: 'error', message: e.message },
+          event
+        )
+      }
+    }
   }
 
   return { form: superValidate(resetPasswordSchema), email: user.email }
@@ -50,26 +52,27 @@ export const actions: Actions = {
     }
 
     try {
-      const userId = await validatePasswordResetToken(token)
-      let user = await auth.getUser(userId)
-      await auth.invalidateAllUserSessions(user.userId)
+      await auth.invalidateAllUserSessions(user.user)
       await auth.updateKeyPassword('email', user.email, form.data.password)
 
       if (!user.emailVerified) {
-        user = await auth.updateUserAttributes(user.userId, {
+        await auth.updateUserAttributes(user.id, {
           email_verified: true,
         })
       }
 
       const session = await auth.createSession({
-        userId: user.userId,
+        userId: user.id,
         attributes: {},
       })
 
       event.locals.auth.setSession(session) // set session cookie
 
       setFlash(
-        { type: 'success', message: 'Password successfully changed' },
+        {
+          type: 'success',
+          message: 'Password successfully changed',
+        },
         event
       )
 

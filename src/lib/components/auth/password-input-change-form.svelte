@@ -14,12 +14,19 @@
 </script>
 
 <!-- Form -->
+
+<!-- TODO: merge return {form} with throw redirect.. how does it work together? -->
 <Form.Root
   method="POST"
   {form}
   schema={resetPasswordSchema}
   let:config
   let:delayed
+  options={{
+    validators: resetPasswordSchema,
+    invalidateAll: true,
+    resetForm: false,
+  }}
 >
   <Form.Field {config} name="email">
     <Form.Label>E-Mail</Form.Label>

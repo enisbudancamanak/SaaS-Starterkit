@@ -13,12 +13,6 @@ export const load: PageServerLoad = async (event) => {
     return {
       user: session.user,
     }
-  } else {
-    throw redirect(
-      '/auth/login',
-      { type: 'error', message: 'Please login to proceed!' },
-      event
-    )
   }
 }
 

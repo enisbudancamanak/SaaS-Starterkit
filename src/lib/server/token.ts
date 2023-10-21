@@ -6,7 +6,6 @@ import { VerificationTokenController } from 'oslo/token'
 // @ts-ignore
 import { generateRandomString, alphabet } from 'oslo/random'
 
-import { isWithinExpiration } from 'lucia/utils'
 import { prisma } from '$lib/server/prisma'
 import { auth } from '$lib/server/lucia'
 import { render } from 'svelte-email'
@@ -168,7 +167,7 @@ export const validateEmailVerificationToken = async (token: string) => {
     })
 
   // bigint => number conversion
-  if (!isWithinExpiration(Number(storedToken.expires))) {
+  if (!verificationController.isTokenReusable(storedToken.expires)) {
     throw new Error('Expired token')
   }
   return storedToken.user_id
@@ -207,7 +206,7 @@ export const generatePasswordResetToken = async (userId: string) => {
     },
   })
 
-  return token
+  return token.value
 }
 
 /**
@@ -236,53 +235,11 @@ export const validatePasswordResetToken = async (token: string) => {
       return storedToken
     })
 
-  // bigint => number conversion
   if (!isWithinExpirationDate(storedToken.expires)) {
     throw new Error('Expired token')
   }
 
-  return storedToken.user_id
-}
-
-/**
- *
- * Generate Email Reset Token
- *
- */
-
-export const generateEmailResetToken = async (
-  userId: string,
-  newEmail: string
-) => {
-  const storedUserToken = await prisma.emailResetToken.findFirst({
-    where: {
-      user_id: userId,
-    },
-  })
-
-  if (storedUserToken) {
-    // check if expiration is within 1 hour
-    // and reuse the token if true
-    const reusableStoredToken = verificationController.isTokenReusable(
-      storedUserToken.expires
-    )
-    if (reusableStoredToken) return storedUserToken.id
-  }
-  const token = verificationController.createToken(
-    generateRandomString(63, alphabet('a-z', '0-9')),
-    userId
-  )
-
-  await prisma.emailResetToken.create({
-    data: {
-      token: token.value,
-      expires: token.expiresAt,
-      user_id: userId,
-      new_email: newEmail,
-    },
-  })
-
-  return token
+  return { userId: storedToken.user_id }
 }
 
 /**
@@ -313,8 +270,9 @@ export const validateEmailResetToken = async (token: string) => {
     })
 
   // bigint => number conversion
-  if (!isWithinExpiration(Number(storedToken.expires))) {
+  if (!verificationController.isTokenReusable(storedToken.expires)) {
     throw new Error('Expired token')
   }
+
   return storedToken.new_email
 }

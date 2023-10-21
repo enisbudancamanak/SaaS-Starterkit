@@ -167,7 +167,7 @@ export const actions: Actions = {
 
           event.locals.auth.setSession(session) // set session cookie
         } catch (e: any) {
-          throw redirect(
+          setFlash(
             { type: 'error', message: 'An unknown error occurred' },
             event
           )

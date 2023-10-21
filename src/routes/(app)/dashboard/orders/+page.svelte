@@ -40,7 +40,7 @@
     })),
   ]
 
-  const table = createTable(readable(orders), {
+  const table = createTable(writable(orders), {
     sort: addSortBy({ disableMultiSort: true }),
     page: addPagination({ initialPageSize: 10 }),
     filter: addTableFilter({

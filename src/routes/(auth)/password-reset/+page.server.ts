@@ -4,10 +4,8 @@ import { enterEmailSchema } from '$lib/schema'
 
 import type { PageServerLoad, Actions } from './$types'
 import { redirect, setFlash } from 'sveltekit-flash-message/server'
-import {
-  generatePasswordResetToken,
-  sendPasswordResetEmail,
-} from '$lib/server/token'
+import { generatePasswordResetToken } from '$lib/server/token'
+import { sendPasswordResetEmail } from '$lib/emails/sendEmails'
 
 export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
@@ -15,7 +13,7 @@ export const load: PageServerLoad = async (event) => {
     if (!session.user.emailVerified)
       throw redirect(
         '/email-verification',
-        { type: 'error', message: 'email not verified' },
+        { type: 'error', message: 'Email not verified' },
         event
       )
     throw redirect(302, '/home')

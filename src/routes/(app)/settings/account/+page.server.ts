@@ -3,9 +3,10 @@ import type { PageServerLoad, Actions } from './$types'
 import { redirect, setFlash } from 'sveltekit-flash-message/server'
 import { updateProfileDetailsSchema, resetPasswordSchema } from '$lib/schema'
 import { fail } from '@sveltejs/kit'
-import { generateEmailResetToken, sendEmailResetEmail } from '$lib/server/token'
+import { generateEmailResetToken } from '$lib/server/token'
 import { auth } from '$lib/server/lucia'
 import { BASE_URL } from '$env/static/private'
+import { sendEmailResetEmail } from '$lib/emails/sendEmails'
 
 export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()

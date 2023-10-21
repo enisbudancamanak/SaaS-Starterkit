@@ -105,10 +105,12 @@ export const GET: PageServerLoad = async (event) => {
   } catch (e) {
     if (e instanceof OAuthRequestError) {
       // invalid code
+      setFlash({ type: 'error', message: 'An unknown error occurred' }, event)
       return new Response(null, {
         status: 400,
       })
     }
+    setFlash({ type: 'error', message: 'An unknown error occurred' }, event)
     return new Response(null, {
       status: 500,
     })

@@ -1,29 +1,18 @@
-<script>
+<script lang="ts">
   // Icons
-  import SpinnerIcon from '~icons/gg/spinner'
+  import SpinnerIcon from '~icons/svg-spinners/180-ring-with-bg'
 
   //@ts-ignore
   import SvelteOtp from '@k4ung/svelte-otp'
-
-  let code = ''
 
   // UI
   import { Button } from '$lib/components/ui/button'
   import { Input } from '$lib/components/ui/input'
   import { enhance } from '$app/forms'
 
-  // Utils
-  // let isLoading = false
-  // async function onSubmit() {
-  //   isLoading = true
-
-  //   setTimeout(() => {
-  //     isLoading = false
-  //     goto('/home')
-  //   }, 1000)
-  // }
-
-  export let email = ''
+  export let email: String | undefined
+  let submitting: boolean = false
+  let code: String = ''
 </script>
 
 <!-- Sent to email@email.de -->
@@ -34,7 +23,17 @@
 
 <!-- Form -->
 <div class="flex flex-col items-center gap-2">
-  <form use:enhance method="post" action="?/validateCode">
+  <form
+    use:enhance={() => {
+      submitting = true
+      return async ({ result, update }) => {
+        if (result.type === 'failure') submitting = false
+        update({ reset: false })
+      }
+    }}
+    method="post"
+    action="?/validateCode"
+  >
     <div class="grid max-w-xs gap-3">
       <SvelteOtp
         wrapperClass="flex justify-center gap-2"
@@ -46,19 +45,23 @@
       />
 
       <Input
-        id="code"
         type="text"
         name="code"
         autocapitalize="none"
         autocorrect="off"
-        class="hidden"
         bind:value={code}
+        class="hidden"
       />
-      <Button class="capitalize">continue</Button>
+      <Button class="capitalize" disabled={submitting}>
+        {#if submitting}
+          <SpinnerIcon class="w-6 h-6 mr-2" />
+        {/if}
+        continue</Button
+      >
     </div>
   </form>
 
-  <!-- Wrong email? -->
+  <!-- No code received? -->
   <form action="?/resendCode" method="post" use:enhance>
     <p class="text-sm text-center text-muted-foreground">
       Didn't receive a code?

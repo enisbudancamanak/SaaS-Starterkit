@@ -12,7 +12,7 @@ export const load: PageServerLoad = async (event) => {
     if (!session.user.emailVerified)
       throw redirect(
         '/email-verification',
-        { type: 'error', message: 'email not verified' },
+        { type: 'error', message: 'Email not verified' },
         event
       )
     throw redirect(302, '/home')

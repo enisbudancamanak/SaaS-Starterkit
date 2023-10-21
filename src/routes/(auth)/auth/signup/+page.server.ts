@@ -3,13 +3,13 @@ import { newUserSchema } from '$lib/schema'
 import { auth } from '$lib/server/lucia'
 import {
   generateEmailVerificationToken,
-  generateVerificationToken,
-  sendVerificationEmail,
+  generateEmailVerificationCode,
 } from '$lib/server/token'
 import type { Actions, PageServerLoad } from './$types'
 import { redirect, setFlash } from 'sveltekit-flash-message/server'
 import { fail } from '@sveltejs/kit'
 import { LuciaError } from 'lucia'
+import { sendVerificationEmail } from '$lib/emails/sendEmails'
 
 export const load: PageServerLoad = async (event) => {
   const session = await event.locals.auth.validate()
@@ -46,6 +46,7 @@ export const actions: Actions = {
           email: form.data.email.toLowerCase(),
           email_verified: false,
           profile_picture: '',
+          github_username: '',
         },
       })
 
@@ -55,7 +56,7 @@ export const actions: Actions = {
       })
       event.locals.auth.setSession(session) // set session cookie
 
-      const code = await generateVerificationToken(user.userId)
+      const code = await generateEmailVerificationCode(user.userId)
       const token = await generateEmailVerificationToken(user.userId)
 
       await sendVerificationEmail(code, token)
@@ -90,7 +91,6 @@ export const actions: Actions = {
         event.locals.auth.setSession(session) // set session cookie
 
         // send verification code
-
         // const code = await generateVerificationToken(user.id)
         // const token = await generateEmailVerificationToken(user.id)
 

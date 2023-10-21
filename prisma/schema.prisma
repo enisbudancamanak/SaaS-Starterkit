@@ -28,28 +28,28 @@ model VerificationCode {
   id        Int       @id @default(autoincrement())
   user_id   String
   code      String
-  expires   BigInt
+  expires   DateTime
 }
 
 model EmailVerificationToken {
   id       Int       @id @default(autoincrement())
   user_id  String
   token    String
-  expires  BigInt
+  expires  DateTime
 }
 
 model PasswordResetToken {
   id        Int       @id @default(autoincrement())
   user_id   String
   token     String
-  expires   BigInt
+  expires   DateTime
 }
 
 model EmailResetToken {
   id        Int       @id @default(autoincrement())
   user_id   String
   token     String
-  expires   BigInt
+  expires   DateTime
   new_email String
 }
 

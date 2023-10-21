@@ -78,17 +78,21 @@
             <Form.PasswordToggle bind:passwordVisible />
           </div>
           <Form.Validation />
+          <div class="flex w-full">
+            <a href="/password-reset" class="w-full text-sm text-right link">
+              Forgot?
+            </a>
+          </div>
         </Form.Item>
       </Form.Field>
-      <div class="flex justify-between mb-4">
-        <Form.Field {config} name="checkbox">
+      <!-- <div class="flex justify-between mb-4"> -->
+      <!-- <Form.Field {config} name="checkbox">
           <Form.Item class="flex space-x-1 space-y-0.5 ">
             <Form.Checkbox disabled={submitting} />
             <Form.Label class="leading-none">Remember me</Form.Label>
           </Form.Item>
-        </Form.Field>
-        <a href="/password-reset" class="text-sm link"> Forgot? </a>
-      </div>
+        </Form.Field> -->
+      <!-- </div> -->
       <Form.Button class="w-full" disabled={submitting}>
         {#if submitting}
           <Spinner class="w-4 h-4 mr-2" />

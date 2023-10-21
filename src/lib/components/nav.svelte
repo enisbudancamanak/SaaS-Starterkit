@@ -14,10 +14,7 @@
       title: 'Home',
       href: '/home',
     },
-    {
-      title: 'Billing',
-      href: '/settings/account/billing',
-    },
+
     {
       title: 'Pricindawdwadawdg',
       href: '/settings/account',

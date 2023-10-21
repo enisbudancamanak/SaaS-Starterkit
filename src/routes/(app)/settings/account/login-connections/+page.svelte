@@ -20,10 +20,15 @@
 
 <div class="space-y-0.5">
   <h2>Login Connections</h2>
+  <p class="text-muted-foreground">
+    Manage your login connections to this account.
+  </p>
 </div>
 <Separator class="my-6" />
 
 <Card class="p-6 !h-fit bg-accent/40  mb-4">
+  <!-- Add new Login connection -->
+
   {#if data.logins}
     <div class="flex flex-col gap-4">
       {#each data.logins as login}

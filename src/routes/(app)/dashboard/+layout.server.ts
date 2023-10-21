@@ -20,20 +20,46 @@ const months = [
 ]
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const [orders, customers, store] = await Promise.all([
-    getAllOrders(),
-    ls.getCustomers(),
-    ls.getStores(),
-  ])
-  const sortedOrders = sortMonths(getOrdersSortedByMonth(orders))
+  const orders = await getAllOrders()
+
+  const fetchCustomers = async () => {
+    return await ls.getCustomers()
+  }
+
+  const fetchStore = async () => {
+    const stores = await ls.getStores()
+    return stores.data[0]
+  }
+
+  const fetchSortedOrders = async () => {
+    return sortMonths(getOrdersSortedByMonth(orders))
+  }
+
+  const fetchTotalRevenue = async () => {
+    const store = await fetchStore()
+    return store.attributes.total_revenue + 1
+  }
+
+  const fetchOrdersTotal = async () => {
+    return orders.length
+  }
+
+  const getAll = async () => {
+    return {
+      orders: orders,
+      store: await fetchStore(),
+      totalRevenue: await fetchTotalRevenue(),
+      ordersTotal: await fetchOrdersTotal(),
+      sortedOrders: await fetchSortedOrders(),
+    }
+  }
 
   return {
-    totalRevenue: store.data[0].attributes.total_revenue + 0.01,
-    ordersTotal: orders.length,
-    orders: Promise.resolve(orders),
-    sortedOrders: Promise.resolve(sortedOrders),
-    customers: Promise.resolve(customers),
-    store: Promise.resolve(store),
+    orders: await getAllOrders(),
+    customers: await fetchCustomers(),
+    streamed: {
+      getAll: getAll(),
+    },
   }
 }
 
@@ -41,7 +67,7 @@ async function getAllOrders() {
   let hasNextPage = true
   let perPage = 10
   let page = 1
-  let data = []
+  let data: any = []
   while (hasNextPage) {
     const resp = await ls.getOrders({ perPage, page })
 

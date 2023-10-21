@@ -1,7 +1,6 @@
 <script lang="ts">
   import { scaleLinear } from 'd3-scale'
   import ChartCard from './chartCard.svelte'
-  import dayjs from 'dayjs'
   import { fade } from 'svelte/transition'
   import { quintInOut } from 'svelte/easing'
 

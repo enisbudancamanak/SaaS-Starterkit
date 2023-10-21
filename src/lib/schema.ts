@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
 export const newUserSchema = z.object({
-  name: z.string().min(3, 'Please type your full name'),
+  name: z
+    .string()
+    .refine(
+      (value) => /^[a-zA-Z]+\s+[a-zA-Z]+$/.test(value),
+      'Please enter your full name'
+    ),
   email: z.string().email({ message: 'E-Mail must be a valid email address' }),
   password: z
     .string()

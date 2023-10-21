@@ -26,9 +26,9 @@
     </div>
 
     <!-- Login Form -->
-    {#if !data?.session?.user?.email}
+    {#if !data?.session?.user?.email && !data?.session?.user?.email_verified}
       <SignupForm form={data.form} />
-    {:else}
+    {:else if !data?.session?.user?.email_verified}
       <EnterCodeForm email={data?.session?.user?.email} />
     {/if}
   </div>

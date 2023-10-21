@@ -1,13 +1,13 @@
 import {
-  validateVerificationToken,
-  generateVerificationToken,
   generateEmailVerificationToken,
+  generateEmailVerificationCode,
   sendVerificationEmail,
+  validateEmailVerificationCode,
 } from '$lib/server/token'
 import type { Actions } from './$types'
 import { auth } from '$lib/server/lucia'
 import { redirect, setFlash } from 'sveltekit-flash-message/server'
-import { fail } from '@sveltejs/kit'
+import { error, fail } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async (event) => {
@@ -15,12 +15,10 @@ export const load: PageServerLoad = async (event) => {
 
   if (session) {
     if (session?.user?.emailVerified) throw redirect(302, '/home')
-
     return {
       session,
     }
   }
-  throw redirect(302, '/auth/signup')
 }
 
 export const actions: Actions = {
@@ -28,7 +26,6 @@ export const actions: Actions = {
     const session = await event.locals.auth.validate()
 
     if (!session) return fail(401)
-
     // Invalidate session
     await auth.invalidateSession(session.sessionId)
 
@@ -52,13 +49,9 @@ export const actions: Actions = {
 
     const user = await auth.getUser(session.user.userId)
 
-    // send verification code
-    const code = await generateVerificationToken(user.userId)
-
-    // console.log(code)
-
+    // send a new verification code
+    const code = await generateEmailVerificationCode(user.userId)
     const token = await generateEmailVerificationToken(user.userId)
-
     await sendVerificationEmail(code, token)
 
     setFlash(
@@ -76,21 +69,32 @@ export const actions: Actions = {
       const session = await event.locals.auth.validate()
 
       if (session) {
-        await validateVerificationToken(session.user.userId, code)
+        if (session.user.emailVerified) {
+          setFlash({ type: 'error', message: 'Email already verified!' }, event)
+          return fail(400)
+        }
 
-        throw redirect(
-          '/home',
-          { type: 'success', message: 'Successfully logged in!' },
-          event
-        )
+        await validateEmailVerificationCode(session.user.userId, code)
+
+        // Update user attributes
+        await auth.updateUserAttributes(session.user.userId, {
+          email_verified: true,
+        })
+
+        setFlash({ type: 'success', message: 'Successfully logged in!' }, event)
+      } else {
+        setFlash({ type: 'error', message: "You're already logged in!" }, event)
+        return fail(400)
       }
     } catch (e: any) {
       if (
         e.message === 'Invalid code' ||
         e.message === 'Code expired, check your inbox' ||
         e.message === 'Too many requests!'
-      )
-        throw redirect({ type: 'error', message: e.message }, event)
+      ) {
+        setFlash({ message: e.message, type: 'error' }, event)
+        return fail(400, e.message)
+      }
     }
   },
 }

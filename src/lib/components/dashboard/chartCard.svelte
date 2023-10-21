@@ -50,8 +50,7 @@
       <span class="text-sm text-muted-foreground">{title}</span>
     {/if}
 
-    {#if stringTimeSpans.length > 0 && value}
-      <div class="flex items-center justify-between">
+    <!-- <div class="flex items-center justify-between">
         <div class="flex items-center justify-between gap-4">
           <span class="text-xl text-foreground"
             >{moneyPrefix ? '€' : ''}{$formattedValue}</span
@@ -71,9 +70,10 @@
             <Select.Item value="system">System</Select.Item>
           </Select.Content>
         </Select.Root>
-      </div>
-    {:else if value}
-      <div class="flex items-center justify-between gap-4">
+      </div> -->
+
+    {#if value}
+      <div class="flex items-center gap-4">
         <span class="text-xl text-foreground"
           >{moneyPrefix ? '€' : ''}{$formattedValue}</span
         >

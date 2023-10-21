@@ -1,58 +1,70 @@
-import { generateRandomString, isWithinExpiration } from 'lucia/utils'
+// Oslo refactoring
+
+import { TimeSpan, isWithinExpirationDate } from 'oslo'
+// @ts-ignore
+import { VerificationTokenController } from 'oslo/token'
+// @ts-ignore
+import { generateRandomString, alphabet } from 'oslo/random'
+
+import { isWithinExpiration } from 'lucia/utils'
 import { prisma } from '$lib/server/prisma'
 import { auth } from '$lib/server/lucia'
 import { render } from 'svelte-email'
-import { sendEmail } from '$lib/emails/send'
 
-// Email Components
-// @ts-ignore
-import VerificationCode from '$lib/emails/components/VerificationCode.svelte'
-// @ts-ignore
-import ResetPassword from '$lib/emails/components/ResetPassword.svelte'
-// @ts-ignore
-import ResetEmail from '$lib/emails/components/ResetEmail.svelte'
-
-const EXPIRES_IN = 1000 * 60 * 5 //5 minutes
-const verificationTimeout = new Map<
+const codeVerificationTimeout = new Map<
   string,
   {
     triesLeft: number
   }
 >()
 
+const verificationController = new VerificationTokenController(
+  new TimeSpan(5, 'm') //expires in 5 minutes
+)
+
 /**
  * Verification code token
  */
 
-export const generateVerificationToken = async (user_id: string) => {
-  const code = generateRandomString(6, '0123456789')
-
-  await prisma.verificationCode.deleteMany({
+export const generateEmailVerificationCode = async (user_id: string) => {
+  const storedUserCode = await prisma.verificationCode.findFirst({
     where: {
       user_id,
     },
   })
 
+  if (storedUserCode) {
+    const reusableStoredCode = verificationController.isTokenReusable(
+      storedUserCode.expires
+    )
+    if (reusableStoredCode) return storedUserCode.code
+  }
+
+  const code = verificationController.createToken(
+    generateRandomString(6, alphabet('0-9')),
+    user_id
+  )
+
   await prisma.verificationCode.create({
     data: {
-      code,
-      expires: Date.now() + EXPIRES_IN,
+      code: code.value,
+      expires: code.expiresAt,
       user_id,
     },
   })
 
-  return code
+  return code.value
 }
 
-export const validateVerificationToken = async (
+export const validateEmailVerificationCode = async (
   user_id: string,
   code: string
 ) => {
   //  prevent brute force by throttling requests
-  let storedTimeout = verificationTimeout.get(user_id) ?? null
+  let storedTimeout = codeVerificationTimeout.get(user_id) ?? null
   if (!storedTimeout) {
     // first attempt - setup throttling
-    verificationTimeout.set(user_id, {
+    codeVerificationTimeout.set(user_id, {
       triesLeft: 4,
     })
   } else {
@@ -61,7 +73,7 @@ export const validateVerificationToken = async (
       throw new Error('Too many requests!')
     }
 
-    verificationTimeout.set(user_id, {
+    codeVerificationTimeout.set(user_id, {
       triesLeft: storedTimeout.triesLeft - 1,
     })
   }
@@ -72,18 +84,15 @@ export const validateVerificationToken = async (
     },
   })
 
-  if (!storedToken || storedToken.code !== code) throw new Error('Invalid code')
+  if (!storedToken) throw new Error('Invalid code')
 
-  const tokenExpires = Number(storedToken.expires)
-  if (!isWithinExpiration(tokenExpires)) {
-    generateVerificationToken(user_id) //Resend code
-    verificationTimeout.delete(user_id)
+  if (!verificationController.isTokenReusable(storedToken.expires)) {
+    generateEmailVerificationCode(user_id) //Resend code
 
     throw new Error('Code expired, check your inbox')
   }
 
-  verificationTimeout.delete(user_id)
-
+  codeVerificationTimeout.delete(user_id)
   let user = await auth.getUser(user_id)
   // await auth.invalidateAllUserSessions(user.userId)
   user = await auth.updateUserAttributes(user.userId, {
@@ -115,22 +124,26 @@ export const generateEmailVerificationToken = async (user_id: string) => {
   })
 
   if (storedUserToken) {
-    const reusableStoredToken = isWithinExpiration(
-      Number(storedUserToken.expires) - EXPIRES_IN * 5
+    const reusableStoredToken = verificationController.isTokenReusable(
+      storedUserToken.expires
     )
-    if (reusableStoredToken) return storedUserToken.id
+    if (reusableStoredToken) return storedUserToken.token
   }
-  const token = generateRandomString(63)
+
+  const token = verificationController.createToken(
+    generateRandomString(63, alphabet('a-z', '0-9')),
+    user_id
+  )
 
   await prisma.emailVerificationToken.create({
     data: {
-      token: token,
-      expires: new Date().getTime() + EXPIRES_IN,
+      token: token.value,
+      expires: token.expiresAt,
       user_id,
     },
   })
 
-  return token
+  return token.value
 }
 
 export const validateEmailVerificationToken = async (token: string) => {
@@ -173,25 +186,35 @@ export const generatePasswordResetToken = async (userId: string) => {
   })
 
   if (storedUserToken) {
-    // check if expiration is within 1 hour
+    // check if expiration is within TimeSpan
     // and reuse the token if true
-    const reusableStoredToken = isWithinExpiration(
-      Number(storedUserToken.expires) - EXPIRES_IN * 5
-    ) //Withing 25 minutes
-    if (reusableStoredToken) storedUserToken.id
-  }
-  const token = generateRandomString(63)
+    const reusableStoredToken = verificationController.isTokenReusable(
+      storedUserToken.expires
+    )
 
+    // isWithinExpiration(Number(storedUserToken.expires) - EXPIRES_IN * 5) //Withing 25 minutes
+    if (reusableStoredToken) return storedUserToken.id
+  }
+  const token = verificationController.createToken(
+    generateRandomString(63, alphabet('a-z', '0-9')),
+    userId
+  )
   await prisma.passwordResetToken.create({
     data: {
-      token: token,
-      expires: new Date().getTime() + EXPIRES_IN,
+      token: token.value,
+      expires: token.expiresAt,
       user_id: userId,
     },
   })
 
   return token
 }
+
+/**
+ *
+ * Validate Password Reset Token
+ *
+ */
 
 export const validatePasswordResetToken = async (token: string) => {
   const storedToken = await prisma.passwordResetToken
@@ -214,52 +237,11 @@ export const validatePasswordResetToken = async (token: string) => {
     })
 
   // bigint => number conversion
-  if (!isWithinExpiration(Number(storedToken.expires))) {
+  if (!isWithinExpirationDate(storedToken.expires)) {
     throw new Error('Expired token')
   }
 
   return storedToken.user_id
-}
-
-/**
- * Send password reset email
- */
-
-export const sendPasswordResetEmail = async (token: string | number) => {
-  const emailHtml = render({
-    template: ResetPassword,
-    props: { token: token },
-  })
-
-  await sendEmail({
-    from: 'enis.budancamanak@hotmail.com',
-    to: 'enis.budancamanak@hotmail.com',
-    subject: 'Reset your password',
-    html: emailHtml,
-  })
-}
-
-/**
- *
- * Send verification email
- *
- */
-
-export const sendVerificationEmail = async (
-  code: string,
-  token: string | number
-) => {
-  const emailHtml = render({
-    template: VerificationCode,
-    props: { code: code, token: token },
-  })
-
-  await sendEmail({
-    from: 'enis.budancamanak@hotmail.com',
-    to: 'enis.budancamanak@hotmail.com',
-    subject: 'Verify Your Email Address',
-    html: emailHtml,
-  })
 }
 
 /**
@@ -281,47 +263,26 @@ export const generateEmailResetToken = async (
   if (storedUserToken) {
     // check if expiration is within 1 hour
     // and reuse the token if true
-    const reusableStoredToken = isWithinExpiration(
-      Number(storedUserToken.expires) - EXPIRES_IN * 5
+    const reusableStoredToken = verificationController.isTokenReusable(
+      storedUserToken.expires
     )
     if (reusableStoredToken) return storedUserToken.id
   }
-  const token = generateRandomString(63)
+  const token = verificationController.createToken(
+    generateRandomString(63, alphabet('a-z', '0-9')),
+    userId
+  )
 
   await prisma.emailResetToken.create({
     data: {
-      token: token,
-      expires: new Date().getTime() + EXPIRES_IN,
+      token: token.value,
+      expires: token.expiresAt,
       user_id: userId,
       new_email: newEmail,
     },
   })
 
   return token
-}
-
-/**
- *
- * Send Email Reset Email
- *
- */
-
-export const sendEmailResetEmail = async (
-  token: string | number,
-  oldEmail: string,
-  newEmail: string
-) => {
-  const emailHtml = render({
-    template: ResetEmail,
-    props: { token: token, oldEmail: oldEmail, newEmail: newEmail },
-  })
-
-  await sendEmail({
-    from: 'enis.budancamanak@hotmail.com',
-    to: 'enis.budancamanak@hotmail.com',
-    subject: 'Confirm Email change',
-    html: emailHtml,
-  })
 }
 
 /**

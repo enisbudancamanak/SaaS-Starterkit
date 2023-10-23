@@ -119,10 +119,7 @@ export const actions: Actions = {
         }
         setFlash({ message: 'Picture uploaded!', type: 'success' }, event)
       } catch (e: any) {
-        throw redirect(
-          { type: 'error', message: 'An unknown error occurred' },
-          event
-        )
+        setFlash({ type: 'error', message: 'An unknown error occurred' }, event)
       }
     }
   },
@@ -139,7 +136,7 @@ export const actions: Actions = {
       }
 
       try {
-        const key = await auth.useKey(
+        await auth.useKey(
           'email',
           session.user.email.toLowerCase(),
           form.data.current
@@ -181,10 +178,7 @@ export const actions: Actions = {
     try {
       setFlash({ type: 'success', message: 'Successfully logged in' }, event)
     } catch (e: any) {
-      throw redirect(
-        { type: 'error', message: 'An unknown error occurred' },
-        event
-      )
+      setFlash({ type: 'error', message: 'An unknown error occurred' }, event)
     }
   },
 }

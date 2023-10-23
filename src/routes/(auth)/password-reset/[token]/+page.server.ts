@@ -15,27 +15,27 @@ export const load: PageServerLoad = async (event) => {
   const { params } = event
   token = params.token
 
+  try {
+    const { userId } = await validatePasswordResetToken(params.token)
+    user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+    })
+  } catch (e: any) {
+    if (e.message === 'Invalid token' || e.message === 'Expired token') {
+      throw redirect(
+        302,
+        '/auth/login',
+        { type: 'error', message: e.message },
+        event
+      )
+    }
+  }
+
   if (session) {
     if (!session.user.emailVerified) throw redirect(302, '/email-verification')
     throw redirect(302, '/home')
-  } else {
-    try {
-      const { userId } = await validatePasswordResetToken(params.token)
-      user = await prisma.user.findFirst({
-        where: {
-          id: userId,
-        },
-      })
-    } catch (e: any) {
-      if (e.message === 'Invalid token' || e.message === 'Expired token') {
-        throw redirect(
-          302,
-          '/auth/login',
-          { type: 'error', message: e.message },
-          event
-        )
-      }
-    }
   }
 
   return { form: superValidate(resetPasswordSchema), email: user.email }
@@ -67,20 +67,17 @@ export const actions: Actions = {
       })
 
       event.locals.auth.setSession(session) // set session cookie
-
-      setFlash(
-        {
-          type: 'success',
-          message: 'Password successfully changed',
-        },
-        event
-      )
-
-      return { form }
     } catch (e) {
-      return new Response('Invalid or expired password reset link', {
-        status: 400,
-      })
+      setFlash({ type: 'error', message: 'An unknown error occurred' }, event)
     }
+
+    throw redirect(
+      '/auth/signup',
+      {
+        type: 'success',
+        message: 'Password successfully changed',
+      },
+      event
+    )
   },
 }

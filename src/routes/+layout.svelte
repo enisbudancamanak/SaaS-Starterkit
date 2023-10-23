@@ -9,24 +9,14 @@
   import { initFlash } from 'sveltekit-flash-message/client'
   import { initThemeValue, getThemeValue } from '$lib/themeSwitchHandler'
   import { onMount } from 'svelte'
+  import { setupViewTransition } from 'sveltekit-view-transition'
 
   onMount(() => {
     getThemeValue()
   })
 
-  // https://svelte.dev/blog/view-transitions
-  onNavigate((navigation) => {
-    // @ts-ignore
-    if (!document.startViewTransition) return
-
-    return new Promise((resolve) => {
-      // @ts-ignore
-      document.startViewTransition(async () => {
-        resolve()
-        await navigation.complete
-      })
-    })
-  })
+  // https://github.com/paoloricciuti/sveltekit-view-transition
+  setupViewTransition()
 
   //Flash Messages
   // https://www.youtube.com/watch?v=hB6OkaYWS5I

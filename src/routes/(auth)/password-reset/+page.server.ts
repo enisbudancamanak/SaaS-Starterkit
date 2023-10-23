@@ -52,10 +52,10 @@ export const actions: Actions = {
 
       return { form }
     } catch (e) {
-      throw redirect(
-        { type: 'error', message: 'An unknown error occurred' },
-        event
-      )
+      setFlash({ type: 'error', message: 'An unknown error occurred' }, event)
+      return fail(400, {
+        form,
+      })
     }
   },
 }

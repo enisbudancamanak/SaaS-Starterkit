@@ -15,7 +15,6 @@
 
 <!-- Form -->
 
-<!-- TODO: merge return {form} with throw redirect.. how does it work together? -->
 <Form.Root
   method="POST"
   {form}
@@ -24,7 +23,7 @@
   let:delayed
   options={{
     validators: resetPasswordSchema,
-    invalidateAll: true,
+    invalidateAll: false,
     resetForm: false,
   }}
 >

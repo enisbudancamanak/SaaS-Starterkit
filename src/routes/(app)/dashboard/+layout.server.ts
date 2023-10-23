@@ -20,7 +20,11 @@ const months = [
 ]
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const orders = await getAllOrders()
+  const fetchAllOrders = async () => {
+    return await getAllOrders()
+  }
+
+  let orders = await fetchAllOrders()
 
   const fetchCustomers = async () => {
     return await ls.getCustomers()

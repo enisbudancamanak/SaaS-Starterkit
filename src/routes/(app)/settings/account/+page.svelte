@@ -16,6 +16,9 @@
 
 <div class="space-y-0.5">
   <h2>Profile</h2>
+  <p class="text-muted-foreground">
+    Manage your profile information and change your password.
+  </p>
 </div>
 <Separator class="my-6" />
 

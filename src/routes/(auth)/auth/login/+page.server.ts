@@ -53,16 +53,8 @@ export const actions: Actions = {
       } else if (e.message === 'AUTH_INVALID_KEY_ID') {
         // user does not exist or invalid password
         return setError(form, 'email', 'Incorrect email')
-
-        // throw redirect(
-        //   { type: 'error', message: 'Incorrect email or password' },
-        //   event
-        // )
       }
-      throw redirect(
-        { type: 'error', message: 'An unknown error occurred' },
-        event
-      )
+      setFlash({ type: 'error', message: 'An unknown error occurred' }, event)
     }
   },
 }

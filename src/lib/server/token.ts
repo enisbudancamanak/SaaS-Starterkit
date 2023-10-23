@@ -8,7 +8,6 @@ import { generateRandomString, alphabet } from 'oslo/random'
 
 import { prisma } from '$lib/server/prisma'
 import { auth } from '$lib/server/lucia'
-import { render } from 'svelte-email'
 
 const codeVerificationTimeout = new Map<
   string,
@@ -240,6 +239,45 @@ export const validatePasswordResetToken = async (token: string) => {
   }
 
   return { userId: storedToken.user_id }
+}
+
+/**
+ *
+ * Generate Email Reset Token
+ *
+ */
+export const generateEmailResetToken = async (
+  user_id: string,
+  new_email: string
+) => {
+  const storedUserToken = await prisma.emailResetToken.findFirst({
+    where: {
+      user_id,
+    },
+  })
+
+  if (storedUserToken) {
+    const reusableStoredToken = verificationController.isTokenReusable(
+      storedUserToken.expires
+    )
+    if (reusableStoredToken) return storedUserToken.token
+  }
+
+  const token = verificationController.createToken(
+    generateRandomString(63, alphabet('a-z', '0-9')),
+    user_id
+  )
+
+  await prisma.emailResetToken.create({
+    data: {
+      token: token.value,
+      expires: token.expiresAt,
+      user_id,
+      new_email,
+    },
+  })
+
+  return token.value
 }
 
 /**

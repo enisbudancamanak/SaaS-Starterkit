@@ -13,8 +13,6 @@ export const GET: PageServerLoad = async (event) => {
     if (session) {
       const newEmail = await validateEmailResetToken(token)
 
-      // TODO: update users key
-
       await prisma.key.update({
         where: { user_id: session.user.id, id: 'email:' + session.user.email },
         data: { id: 'email:' + newEmail },
